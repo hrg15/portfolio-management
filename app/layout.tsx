@@ -24,7 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={font.className}>
         <Providers>
-          <main className="h-screen overflow-hidden">{children}</main>
+          <main className="h-screen">{children}</main>
         </Providers>
       </body>
     </html>
