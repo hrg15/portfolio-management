@@ -21,10 +21,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={font.className}>
+    <html className="h-full" lang="en">
+      <body className={font.className + " h-full"}>
         <Providers>
-          <main className="h-screen">{children}</main>
+          <main className="h-full">{children}</main>
         </Providers>
       </body>
     </html>

@@ -26,6 +26,12 @@ const config = {
           3: "#202125",
           4: "#18191D",
         },
+        error: {
+          DEFAULT: "#b71153",
+        },
+        success: {
+          DEFAULT: "#54ad73",
+        },
       },
       keyframes: {
         "accordion-down": {

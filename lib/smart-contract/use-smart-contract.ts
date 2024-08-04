@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { ethers } from "ethers";
 import contractABI from "@/lib/smart-contract/ABI.json";
 
-const contractAddress = "YOUR_CONTRACT_ADDRESS";
+const contractAddress = "0x5d909293e9dcbd4f99e089bf016aa5f377b02f56";
 
 interface BlockchainState {
   provider: ethers.BrowserProvider | null;

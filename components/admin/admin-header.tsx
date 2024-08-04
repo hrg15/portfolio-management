@@ -9,7 +9,7 @@ import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import QuickPercentSlider from "../quick-percent-slider";
 import { calculateProportion, roundDown, times } from "@/lib/math";
 
-const PortfolioHeader = () => {
+const AdminHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedSide, setSelectedSide] = useState<"WITHDRAW" | "DEPOSIT">(
     "WITHDRAW",
@@ -25,7 +25,7 @@ const PortfolioHeader = () => {
   };
   return (
     <>
-      <div className="min-h-[500px] w-full bg-black-4 pb-10 pt-2">
+      <div className="w-full bg-black-4 pb-10 pt-2">
         <div className="container space-y-10">
           <div className="flex items-center justify-between">
             <Link href="/">
@@ -57,23 +57,46 @@ const PortfolioHeader = () => {
                 crypto portfolio on Ethereum L1.
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <Button
+                size="sm"
                 onClick={() => {
                   setSelectedSide("WITHDRAW");
                   setIsOpen(true);
                 }}
+                variant="outline"
               >
-                Withdraw
+                Withdraw whole fund
               </Button>
               <Button
+                size="sm"
+                onClick={() => {
+                  setSelectedSide("WITHDRAW");
+                  setIsOpen(true);
+                }}
+                variant="outline"
+              >
+                Emergency Withdraw to ETH
+              </Button>
+              <Button
+                size="sm"
+                onClick={() => {
+                  setSelectedSide("WITHDRAW");
+                  setIsOpen(true);
+                }}
+                variant="outline"
+              >
+                Emergency Withdraw to Token
+              </Button>
+              <Button
+                size="sm"
                 onClick={() => {
                   setSelectedSide("DEPOSIT");
                   setIsOpen(true);
                 }}
                 variant="outline"
               >
-                Deposit
+                Liquidate contract
               </Button>
             </div>
           </div>
@@ -103,4 +126,4 @@ const PortfolioHeader = () => {
   );
 };
 
-export default PortfolioHeader;
+export default AdminHeader;

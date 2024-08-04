@@ -81,7 +81,7 @@ function fixNumbers(str: string): string {
 export const numberInputSanitizer = (
   event: React.ChangeEvent<HTMLInputElement>,
   callback: (event: React.ChangeEvent<HTMLInputElement>) => void,
-  precision?: number
+  precision?: number,
 ) => {
   event.target.value = fixNumbers(event.target.value);
 
@@ -154,3 +154,34 @@ export const calculateChartMinMove = (precision: number) => {
 export const calculateChartPrecision = (precision: number) => {
   return Math.max(precision, 2);
 };
+
+const monthNames = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+export function monthDate() {
+  const currentDate = new Date();
+
+  const lastMonth = new Date(
+    currentDate.getFullYear(),
+    currentDate.getMonth() - 1,
+  );
+  const currentMonth = currentDate.getMonth();
+
+  const lastMonthName = monthNames[lastMonth.getMonth()];
+  const currentMonthName = monthNames[currentMonth];
+  const currentYear = currentDate.getFullYear();
+
+  const dateRange = `${lastMonthName} - ${currentMonthName}${currentYear}`;
+  return dateRange;
+}
