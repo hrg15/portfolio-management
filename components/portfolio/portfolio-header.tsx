@@ -15,13 +15,26 @@ const PortfolioHeader = () => {
     "WITHDRAW",
   );
   const [calculatedPercent, setCalculatedPercent] = useState(0);
-  const { balance, connectWallet } = useSmartContractStore();
+  const {
+    balance,
+    isConnecting,
+    connectWallet,
+    account,
+    error,
+    contract,
+    signer,
+  } = useSmartContractStore();
+  console.log("contract", contract);
+  console.log("account", account);
+  console.log("signer", signer);
+  console.log("error", error);
+  console.log("isConnecting", isConnecting);
 
   const handlePercentChange = (percent: number) => {
     const amountToPay = calculateProportion(1, percent);
 
     const total = roundDown(times(amountToPay, 1), 1);
-    console.log(total);
+    // console.log(total);
   };
   return (
     <>

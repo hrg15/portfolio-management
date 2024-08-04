@@ -44,13 +44,13 @@ const useSmartContractStore = create<BlockchainState>((set, get) => ({
           contractABI.abi,
           signer,
         );
-        const balance = await contractInstance.balanceOf(address);
+        // const balance = await contractInstance.balanceOf(address);
         set({
           provider,
           signer,
           account: address,
           contract: contractInstance,
-          balance: ethers.formatEther(balance),
+          // balance: ethers.formatEther(balance),
           isConnecting: false,
         });
       } else {
