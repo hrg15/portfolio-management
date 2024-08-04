@@ -1,9 +1,8 @@
 "use client";
 
-import * as React from "react";
+import React, { useEffect, useState } from "react";
 import { TrendingUp } from "lucide-react";
 import { Label, Pie, PieChart } from "recharts";
-
 import {
   Card,
   CardContent,
@@ -18,6 +17,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 
 const chartData = [
   { browser: "btc", amount: 50, fill: "#E88C30" },
@@ -51,6 +51,8 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const PortfolioChart = () => {
+  const { balance } = useSmartContractStore();
+
   return (
     <div>
       <Card className="flex flex-col">

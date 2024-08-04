@@ -5,12 +5,24 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { ResponsiveDialog } from "../responsive-dialog";
+import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
+import QuickPercentSlider from "../quick-percent-slider";
+import { calculateProportion, roundDown, times } from "@/lib/math";
 
 const PortfolioHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedSide, setSelectedSide] = useState<"WITHDRAW" | "DEPOSIT">(
     "WITHDRAW",
   );
+  const [calculatedPercent, setCalculatedPercent] = useState(0);
+  const { balance, connectWallet } = useSmartContractStore();
+
+  const handlePercentChange = (percent: number) => {
+    const amountToPay = calculateProportion(1, percent);
+
+    const total = roundDown(times(amountToPay, 1), 1);
+    console.log(total);
+  };
   return (
     <>
       <div className="min-h-[500px] w-full bg-black-4 pb-10 pt-2">
@@ -27,7 +39,7 @@ const PortfolioHeader = () => {
             <h1 className="hidden text-2xl font-bold text-white md:block">
               Portfolio ReBalancer
             </h1>
-            <button>
+            <button onClick={() => connectWallet()}>
               <Image
                 alt="Logo"
                 src="/assets/metamask-fox.svg"
@@ -74,6 +86,13 @@ const PortfolioHeader = () => {
       >
         <div className="">
           Are sure to {selectedSide === "WITHDRAW" ? "Withdraw" : "Deposit"}
+          <QuickPercentSlider
+            side="buy"
+            percent={calculatedPercent}
+            setPercent={handlePercentChange}
+            disabled={false}
+            className="order-4"
+          />
         </div>
       </ResponsiveDialog>
     </>
