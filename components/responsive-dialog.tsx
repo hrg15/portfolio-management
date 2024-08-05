@@ -70,12 +70,11 @@ export function ResponsiveDialog({
       <DrawerTrigger asChild>{trigger}</DrawerTrigger>
       <DrawerContent
         className={cn(
-          "max-h-[90vh] w-auto rounded-t-2xl !border-none !outline-none !ring-0",
+          "max-h-[90vh] w-auto rounded-t-[3rem] !border-none !outline-none !ring-0",
           className,
         )}
         onCloseAutoFocus={onCloseAutoFocus}
       >
-        <div className="mx-auto h-1 w-12 rounded-full bg-neutral-200"></div>
         <DrawerHeader className="text-center">
           <DrawerTitle className="capitalize">{title}</DrawerTitle>
           <DrawerDescription>{description}</DrawerDescription>

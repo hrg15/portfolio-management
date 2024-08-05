@@ -34,7 +34,7 @@ const AdminTable = () => {
   };
   return (
     <Card className="flex flex-col">
-      <CardHeader className="items-center pb-0">
+      <CardHeader className="items-center pb-6">
         <CardTitle className="capitalize">
           {selectedTab === "wl-users" ? "White List Users" : "Tokens"}
         </CardTitle>

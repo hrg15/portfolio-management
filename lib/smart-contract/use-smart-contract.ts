@@ -1,8 +1,10 @@
 import { create } from "zustand";
 import { ethers } from "ethers";
 import contractABI from "@/lib/smart-contract/ABI.json";
+import USDT_ABI from "@/lib/smart-contract/USDT_ABI.json";
 
 const contractAddress = "0x5d909293e9dcbd4f99e089bf016aa5f377b02f56";
+const usdtContractAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // Ethereum Mainnet USDT address
 
 interface BlockchainState {
   provider: ethers.BrowserProvider | null;
@@ -11,12 +13,12 @@ interface BlockchainState {
   contract: ethers.Contract | null;
   balance: string;
   isConnecting: boolean;
+  isWalletConnected: boolean;
   error: string | null;
   connectWallet: () => Promise<void>;
   disconnect: () => void;
   deposit: (amount: string) => Promise<void>;
   withdraw: (amount: string, toAddress?: string) => Promise<void>;
-  getAllowedWithdrawAddresses: () => Promise<string[]>;
 }
 
 const useSmartContractStore = create<BlockchainState>((set, get) => ({
@@ -26,6 +28,7 @@ const useSmartContractStore = create<BlockchainState>((set, get) => ({
   contract: null,
   balance: "0",
   isConnecting: false,
+  isWalletConnected: false,
   error: null,
 
   connectWallet: async () => {
@@ -40,8 +43,8 @@ const useSmartContractStore = create<BlockchainState>((set, get) => ({
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
         const contractInstance = new ethers.Contract(
-          contractAddress,
-          contractABI.abi,
+          usdtContractAddress,
+          USDT_ABI,
           signer,
         );
         // const balance = await contractInstance.balanceOf(address);
@@ -52,6 +55,7 @@ const useSmartContractStore = create<BlockchainState>((set, get) => ({
           contract: contractInstance,
           // balance: ethers.formatEther(balance),
           isConnecting: false,
+          isWalletConnected: true,
         });
       } else {
         throw new Error("Please install MetaMask!");
@@ -68,6 +72,7 @@ const useSmartContractStore = create<BlockchainState>((set, get) => ({
       account: null,
       contract: null,
       balance: "0",
+      isWalletConnected: false,
     });
   },
 
@@ -102,20 +107,6 @@ const useSmartContractStore = create<BlockchainState>((set, get) => ({
         set({ error: (error as Error).message });
       }
     }
-  },
-
-  getAllowedWithdrawAddresses: async () => {
-    const { contract, account } = get();
-    if (contract && account) {
-      try {
-        const addresses = await contract.getAllowedWithdrawAddresses(account);
-        return addresses;
-      } catch (error) {
-        set({ error: (error as Error).message });
-        return [];
-      }
-    }
-    return [];
   },
 }));
 

@@ -25,7 +25,8 @@ const AdminHeader = () => {
   };
   return (
     <>
-      <div className="w-full bg-black-4 pb-10 pt-2">
+      <div className="absolute right-0 z-10 h-5 w-full -rotate-[20deg] bg-primary blur-3xl sm:hidden"></div>
+      <div className="w-full bg-black-4 pb-28 pt-2 sm:pb-10">
         <div className="container space-y-10">
           <div className="flex items-center justify-between">
             <Link href="/">
