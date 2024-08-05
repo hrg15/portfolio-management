@@ -15,29 +15,11 @@ const AdminAuth = ({ children }: { children: React.ReactNode }) => {
   const { checkAdminRole } = useAdminEndpoints();
 
   useIsomorphicLayoutEffect(() => {
-    const testCheck = async (codeBytes: string, signer: string) => {
-      if (contract) {
-        try {
-          const admin = await contract.hasRole(codeBytes, signer);
-          if (admin) {
-            console.log("admin", admin);
-          }
-        } catch (error) {
-          console.log(`Error checking admin role: ${(error as Error).message}`);
-          //   return false;
-        }
-      }
-    };
-
     const adminRoleCheck = async () => {
       if (contract && signer) {
         const signerAddress = await signer.getAddress();
-        console.log("signerAddress", signerAddress);
-        console.log("codeBytes", codeBytes);
-        const isAdmin = await testCheck(codeBytes, signerAddress);
+        const isAdmin = await checkAdminRole(codeBytes, signerAddress);
         console.log("isAdmin", isAdmin);
-      } else {
-        console.log("no signer address");
       }
     };
     adminRoleCheck();

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -12,52 +12,145 @@ import {
 } from "@/components/ui/table";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import { Button } from "../ui/button";
-import { ResponsiveDialog } from "../responsive-dialog";
+import { Input } from "../ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { cn } from "@/lib/utils";
+import { AddIcon, DeleteIcon } from "../icons/icons";
+import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
 
 const TokensList = () => {
-  const { contract } = useSmartContractStore();
-
+  const [isOpen, setIsOpen] = useState(false);
+  const [tokens, setTokens] = useState([]);
+  const { contract, isWalletConnected } = useSmartContractStore();
+  const { tokensList } = useAdminEndpoints();
+  useEffect(() => {
+    const getTokens = async () => {
+      if (contract) {
+        const result = await tokensList();
+        console.log(result);
+      }
+    };
+    getTokens();
+  }, [isWalletConnected]);
   return (
-    <div className="w-full">
-      <Button className="mb-2 ms-auto block" size="sm" onClick={() => {}}>
-        Add Token
-      </Button>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="">Symbol</TableHead>
-            <TableHead className="w-[100px]">name</TableHead>
-            <TableHead className="">Address</TableHead>
-            <TableHead className="">Decimals</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          <TableRow>
-            <TableCell className="font-medium">BTC</TableCell>
-            <TableCell className="font-medium">Bitcoin</TableCell>
-            <TableCell className="font-medium">ajsfhds8saKJOIYd90</TableCell>
-            <TableCell className="font-medium">8</TableCell>
-          </TableRow>
-          <TableRow>
-            <TableCell className="font-medium">BTC</TableCell>
-            <TableCell className="font-medium">Bitcoin</TableCell>
-            <TableCell className="font-medium">ajsfhds8saKJOIYd90</TableCell>
-            <TableCell className="font-medium">8</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
-    </div>
+    <>
+      <div className="w-full">
+        <Button
+          className="mb-2 ms-auto flex items-center gap-1"
+          size="sm"
+          onClick={() => {
+            setIsOpen(true);
+          }}
+        >
+          Add Token
+          <AddIcon className="size-5" />
+        </Button>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="">Symbol</TableHead>
+              <TableHead className="w-[100px]">name</TableHead>
+              <TableHead className="">Address</TableHead>
+              <TableHead className="">Decimals</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            <TableRow>
+              <TableCell className="font-medium">BTC</TableCell>
+              <TableCell className="font-medium">Bitcoin</TableCell>
+              <TableCell className="font-medium">ajsfhds8saKJOIYd90</TableCell>
+              <TableCell className="font-medium">8</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-medium">BTC</TableCell>
+              <TableCell className="font-medium">Bitcoin</TableCell>
+              <TableCell className="font-medium">ajsfhds8saKJOIYd90</TableCell>
+              <TableCell className="font-medium">8</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
+      <AddTokenDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+    </>
   );
 };
 
 export default TokensList;
 
-const AddTokenDialog = () => {
-  const [isOpen, setIsOpen] = useState(false);
+const AddTokenDialog = ({
+  isOpen,
+  setIsOpen,
+}: {
+  isOpen: boolean;
+  setIsOpen: (val: boolean) => void;
+}) => {
+  const [inputs, setInputs] = useState(1);
+  const [addresses, setAddresses] = useState<string[]>([""]);
+
+  const { addNewTokens } = useAdminEndpoints();
+
+  const handleInputChange = (index: number, value: string) => {
+    const newAddresses = [...addresses];
+    newAddresses[index] = value;
+    setAddresses(newAddresses);
+  };
+
+  const addAddress = () => {
+    setInputs(inputs + 1);
+    setAddresses([...addresses, ""]);
+  };
+
+  const removeAddress = (index: number) => {
+    const newAddresses = addresses.filter((_, i) => i !== index);
+    setAddresses(newAddresses);
+    setInputs(inputs - 1);
+  };
+
+  const handleSubmitAddToken = async () => {
+    if (!!addresses.length) {
+      const result = await addNewTokens(addresses);
+    }
+  };
 
   return (
-    <ResponsiveDialog open={isOpen} setOpen={setIsOpen}>
-      <div className=""></div>
-    </ResponsiveDialog>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogContent className={cn("sm:max-w-[425px]")}>
+        <DialogHeader className="text-center">
+          <DialogTitle className="capitalize">Add Token</DialogTitle>
+          <DialogDescription>Enter the address of tokens </DialogDescription>
+        </DialogHeader>
+        <div className="max-h-[450px] space-y-3 overflow-auto">
+          {addresses.map((address, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <Input
+                type="text"
+                value={address}
+                onChange={(e) => handleInputChange(index, e.target.value)}
+                placeholder={`Address ${index + 1}`}
+              />
+              <button type="button" onClick={() => removeAddress(index)}>
+                <DeleteIcon className="size-5 text-error" />
+              </button>
+            </div>
+          ))}
+          <Button size="sm" type="button" onClick={addAddress}>
+            Add Address
+          </Button>
+        </div>
+        <Button
+          onClick={handleSubmitAddToken}
+          variant="secondary"
+          className="block w-full"
+        >
+          Submit
+        </Button>
+      </DialogContent>
+    </Dialog>
   );
 };

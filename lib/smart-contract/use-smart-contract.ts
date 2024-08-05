@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { ethers } from "ethers";
 import contractABI from "@/lib/smart-contract/ABI.json";
 import USDT_ABI from "@/lib/smart-contract/USDT_ABI.json";
+import { toast } from "sonner";
 
 const contractAddress = "0x622f5b32ad5D6D2147Ff6c4261e5cE11A2949A9f";
 
@@ -40,22 +41,60 @@ const useSmartContractStore = create<BlockchainState>((set, get) => ({
         typeof window.ethereum !== "undefined"
       ) {
         await window.ethereum.request({ method: "eth_requestAccounts" });
+
+        const chainId = await window.ethereum.request({
+          method: "eth_chainId",
+        });
+
+        // Polygon Mainnet chainId is 0x89, Mumbai Testnet is 0x13881
+        const polygonChainId = "0x89";
+
+        if (chainId !== polygonChainId) {
+          try {
+            await window.ethereum.request({
+              method: "wallet_switchEthereumChain",
+              params: [{ chainId: polygonChainId }],
+            });
+          } catch (switchError: any) {
+            // This error code indicates that the chain has not been added to MetaMask
+            if (switchError?.code === 4902) {
+              await window.ethereum.request({
+                method: "wallet_addEthereumChain",
+                params: [
+                  {
+                    chainId: polygonChainId,
+                    chainName: "Polygon Mainnet",
+                    nativeCurrency: {
+                      name: "MATIC",
+                      symbol: "MATIC",
+                      decimals: 18,
+                    },
+                    rpcUrls: ["https://polygon-rpc.com/"],
+                    blockExplorerUrls: ["https://polygonscan.com/"],
+                  },
+                ],
+              });
+            } else {
+              toast.error("Error adding Polygon Chain");
+              throw switchError;
+            }
+          }
+        }
+
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
-
         const contractInstance = new ethers.Contract(
           contractAddress,
           contractABI.abi,
           signer,
         );
-        // const balance = await contractInstance.balanceOf(address);
+
         set({
           provider,
           signer,
           account: address,
           contract: contractInstance,
-          // balance: ethers.formatEther(balance),
           isConnecting: false,
           isWalletConnected: true,
         });

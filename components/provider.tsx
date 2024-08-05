@@ -22,22 +22,22 @@ export function Providers({ children }: { children: React.ReactNode }) {
     isWalletConnected,
   } = useSmartContractStore();
 
-  useEffect(() => {
-    const testContract = async () => {
-      if (contract) {
-        try {
-          const result = await contract.paused();
-          console.log("tokensList:", result);
-        } catch (error) {
-          console.log("catch", error);
-        }
-      } else {
-        console.log("test: Please connect wallet first.");
-      }
-    };
+  // useEffect(() => {
+  //   const testContract = async () => {
+  //     if (contract) {
+  //       try {
+  //         const result = await contract.tokensList();
+  //         console.log("tokensList:", result);
+  //       } catch (error) {
+  //         console.log("catch", error);
+  //       }
+  //     } else {
+  //       console.log("test: Please connect wallet first.");
+  //     }
+  //   };
 
-    testContract();
-  }, [isWalletConnected]);
+  //   testContract();
+  // }, [isWalletConnected]);
 
   return (
     <QueryClientProvider client={queryClient}>

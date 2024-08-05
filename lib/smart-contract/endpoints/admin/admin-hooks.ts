@@ -21,17 +21,54 @@ export const useAdminEndpoints = () => {
   }, [isWalletConnected, contract, connectWallet]);
 
   const checkAdminRole = useCallback(
-    async (codeBytes: string, signer: string): Promise<boolean> => {
+    async (codeBytes: string, signer: string) => {
       if (!(await ensureConnection())) return false;
 
       try {
         const admin = await contract?.hasRole(codeBytes, signer);
-        if (admin) {
-          console.log("admin", admin);
-          return true;
-        } else {
-          return false;
-        }
+        return admin;
+      } catch (error) {
+        console.log(`Error checking admin role: ${(error as Error).message}`);
+        return false;
+      }
+    },
+    [contract, account, ensureConnection],
+  );
+
+  const addNewTokens = useCallback(
+    async (tokenList: string[]) => {
+      if (!(await ensureConnection())) return false;
+
+      try {
+        const result = await contract?.addTokens(tokenList);
+        return result;
+      } catch (error) {
+        console.log(`Error checking admin role: ${(error as Error).message}`);
+        return false;
+      }
+    },
+    [contract, account, ensureConnection],
+  );
+
+  const tokensList = useCallback(async () => {
+    if (!(await ensureConnection())) return false;
+
+    try {
+      const result = await contract?.tokensList();
+      return result;
+    } catch (error) {
+      console.log(`Error checking admin role: ${(error as Error).message}`);
+      return false;
+    }
+  }, [contract, account, ensureConnection]);
+
+  const addWhiteListUser = useCallback(
+    async (address: string) => {
+      if (!(await ensureConnection())) return false;
+
+      try {
+        const result = await contract?.addWhitelisted(address);
+        return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
         return false;
@@ -81,22 +118,12 @@ export const useAdminEndpoints = () => {
     [contract, account, ensureConnection],
   );
 
-  const getUSDTName = useCallback(async (): Promise<string | null> => {
-    if (!(await ensureConnection())) return null;
-
-    try {
-      const name = await contract?.name();
-      return name;
-    } catch (error) {
-      toast.error(`Failed to get USDT name: ${(error as Error).message}`);
-      return null;
-    }
-  }, [contract, ensureConnection]);
-
   return {
     checkAdminRole,
     deposit,
     withdraw,
-    getUSDTName,
+    addNewTokens,
+    tokensList,
+    addWhiteListUser,
   };
 };
