@@ -8,6 +8,7 @@ import { ResponsiveDialog } from "../responsive-dialog";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import QuickPercentSlider from "../quick-percent-slider";
 import { calculateProportion, roundDown, times } from "@/lib/math";
+import { cn } from "@/lib/utils";
 
 const AdminHeader = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -15,7 +16,7 @@ const AdminHeader = () => {
     "WITHDRAW",
   );
   const [calculatedPercent, setCalculatedPercent] = useState(0);
-  const { balance, connectWallet } = useSmartContractStore();
+  const { balance, connectWallet, isWalletConnected } = useSmartContractStore();
 
   const handlePercentChange = (percent: number) => {
     const amountToPay = calculateProportion(1, percent);
@@ -40,13 +41,31 @@ const AdminHeader = () => {
             <h1 className="hidden text-2xl font-bold text-white md:block">
               Portfolio ReBalancer
             </h1>
-            <button onClick={() => connectWallet()}>
+            <button className="relative" onClick={() => connectWallet()}>
               <Image
                 alt="Logo"
                 src="/assets/metamask-fox.svg"
                 width={50}
                 height={50}
               />
+              <div className="absolute -right-2 -top-2">
+                <span className="relative flex h-2 w-2">
+                  <span
+                    className={cn(
+                      "absolute inline-flex h-full w-full rounded-full opacity-75",
+                      isWalletConnected
+                        ? "animate-ping bg-sky-400"
+                        : "bg-error",
+                    )}
+                  ></span>
+                  <span
+                    className={cn(
+                      "relative inline-flex h-2 w-2 rounded-full",
+                      isWalletConnected ? "bg-sky-500" : "bg-error",
+                    )}
+                  ></span>
+                </span>
+              </div>
             </button>
           </div>
           <div className="space-y-12">

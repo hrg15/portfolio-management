@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -8,10 +10,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
+import { Button } from "../ui/button";
+import { ResponsiveDialog } from "../responsive-dialog";
 
 const TokensList = () => {
+  const { contract } = useSmartContractStore();
+
   return (
     <div className="w-full">
+      <Button className="mb-2 ms-auto block" size="sm" onClick={() => {}}>
+        Add Token
+      </Button>
       <Table>
         <TableHeader>
           <TableRow>
@@ -41,3 +51,13 @@ const TokensList = () => {
 };
 
 export default TokensList;
+
+const AddTokenDialog = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <ResponsiveDialog open={isOpen} setOpen={setIsOpen}>
+      <div className=""></div>
+    </ResponsiveDialog>
+  );
+};

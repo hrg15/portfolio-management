@@ -3,7 +3,8 @@ import { ethers } from "ethers";
 import contractABI from "@/lib/smart-contract/ABI.json";
 import USDT_ABI from "@/lib/smart-contract/USDT_ABI.json";
 
-const contractAddress = "0x5d909293e9dcbd4f99e089bf016aa5f377b02f56";
+const contractAddress = "0x622f5b32ad5D6D2147Ff6c4261e5cE11A2949A9f";
+
 const usdtContractAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // Ethereum Mainnet USDT address
 
 interface BlockchainState {
@@ -42,9 +43,10 @@ const useSmartContractStore = create<BlockchainState>((set, get) => ({
         const provider = new ethers.BrowserProvider(window.ethereum);
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
+
         const contractInstance = new ethers.Contract(
-          usdtContractAddress,
-          USDT_ABI,
+          contractAddress,
+          contractABI.abi,
           signer,
         );
         // const balance = await contractInstance.balanceOf(address);

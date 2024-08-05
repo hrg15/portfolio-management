@@ -18,35 +18,7 @@ const PortfolioHeader = () => {
     "WITHDRAW",
   );
   const [calculatedPercent, setCalculatedPercent] = useState(0);
-  const {
-    balance,
-    isConnecting,
-    connectWallet,
-    account,
-    error,
-    contract,
-    signer,
-    isWalletConnected,
-  } = useSmartContractStore();
-
-  useEffect(() => {
-    const usdtContract = async () => {
-      if (contract) {
-        try {
-          const name = await contract.name();
-          console.log("USDT Name:", name);
-        } catch (error) {
-          console.log("USDT contract not found. catch", error);
-        }
-      } else {
-        console.log(
-          "USDT contract not initialized. Please connect wallet first.",
-        );
-      }
-    };
-
-    usdtContract();
-  }, [isWalletConnected]);
+  const { connectWallet, error, isWalletConnected } = useSmartContractStore();
 
   const handlePercentChange = (percent: number) => {
     const amountToPay = calculateProportion(1, percent);
