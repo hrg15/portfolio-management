@@ -45,6 +45,7 @@ const PortfolioHeader = () => {
                 src="/assets/logo.png"
                 width={110}
                 height={50}
+                style={{ width: "auto", height: "auto" }}
               />
             </Link>
             <h1 className="hidden text-2xl font-bold text-white md:block">
@@ -78,7 +79,13 @@ const PortfolioHeader = () => {
             </button>
           </div>
           <div className="space-y-12">
-            <Image alt="Logo" src="/assets/eth.png" width={80} height={80} />
+            <Image
+              alt="Logo"
+              src="/assets/eth.png"
+              width={80}
+              height={80}
+              style={{ width: "auto", height: "auto" }}
+            />
             <div className="my-20 block space-y-4">
               <h2 className="text-2xl font-semibold sm:text-4xl">
                 Rebalance Portfolio

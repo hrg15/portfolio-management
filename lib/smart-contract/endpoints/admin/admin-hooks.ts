@@ -77,6 +77,54 @@ export const useAdminEndpoints = () => {
     [contract, account, ensureConnection],
   );
 
+  const adminWithdrawWholeFundTokens = useCallback(async () => {
+    if (!(await ensureConnection())) return false;
+
+    try {
+      const result = await contract?.adminWithdrawWholeFundTokens();
+      return result;
+    } catch (error) {
+      console.log(`Error checking admin role: ${(error as Error).message}`);
+      return;
+    }
+  }, [contract, account, ensureConnection]);
+
+  const adminWithdrawWholeFundWETH = useCallback(async () => {
+    if (!(await ensureConnection())) return false;
+
+    try {
+      const result = await contract?.adminWithdrawWholeFundWETH();
+      return result;
+    } catch (error) {
+      console.log(`Error checking admin role: ${(error as Error).message}`);
+      return;
+    }
+  }, [contract, account, ensureConnection]);
+
+  const adminWithdrawWholeFund = useCallback(async () => {
+    if (!(await ensureConnection())) return false;
+
+    try {
+      const result = await contract?.adminWithdrawWholeFundWETH();
+      return result;
+    } catch (error) {
+      console.log(`Error checking admin role: ${(error as Error).message}`);
+      return;
+    }
+  }, [contract, account, ensureConnection]);
+
+  const adminLiquidate = useCallback(async () => {
+    if (!(await ensureConnection())) return false;
+
+    try {
+      const result = await contract?.liquidate();
+      return result;
+    } catch (error) {
+      console.log(`Error checking admin role: ${(error as Error).message}`);
+      return;
+    }
+  }, [contract, account, ensureConnection]);
+
   const deposit = useCallback(
     async (amount: string): Promise<string | null> => {
       if (!(await ensureConnection())) return null;
@@ -125,5 +173,9 @@ export const useAdminEndpoints = () => {
     addNewTokens,
     tokensList,
     addWhiteListUser,
+    adminWithdrawWholeFundTokens,
+    adminWithdrawWholeFundWETH,
+    adminWithdrawWholeFund,
+    adminLiquidate,
   };
 };

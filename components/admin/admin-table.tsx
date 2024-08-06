@@ -43,7 +43,7 @@ const AdminTable = () => {
       <CardContent className="flex w-full flex-col pb-0 md:flex-row">
         <Tabs
           onValueChange={handleChangeCategoryTab}
-          defaultValue="wl-users"
+          value={selectedTab}
           className="w-full"
         >
           <TabsList className="dark justify-start">

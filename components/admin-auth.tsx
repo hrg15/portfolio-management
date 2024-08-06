@@ -8,24 +8,36 @@ import Loading from "./loading";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
 import { codeBytes } from "@/config";
 import { ethers } from "ethers";
+import { useRouter } from "next/navigation";
+import { Routes } from "@/lib/routes";
 
 const AdminAuth = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const { contract, signer, isWalletConnected } = useSmartContractStore();
+  const { contract, signer, isWalletConnected, connectWallet } =
+    useSmartContractStore();
   const { checkAdminRole } = useAdminEndpoints();
+  const router = useRouter();
 
   useIsomorphicLayoutEffect(() => {
     const adminRoleCheck = async () => {
       if (contract && signer) {
         const signerAddress = await signer.getAddress();
         const isAdmin = await checkAdminRole(codeBytes, signerAddress);
-        console.log("isAdmin", isAdmin);
+        if (isAdmin) {
+          setIsLoading(false);
+        } else {
+          toast.error("You don't have admin role.");
+          router.push(Routes.Portfolio);
+        }
+      } else {
+        await connectWallet();
       }
     };
+
     adminRoleCheck();
   }, [isWalletConnected]);
 
-  //   if (isLoading) return <Loading />;
+  if (isLoading) return <Loading />;
 
   return children;
 };
