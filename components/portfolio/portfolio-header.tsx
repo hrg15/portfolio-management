@@ -11,20 +11,30 @@ import { calculateProportion, roundDown, times } from "@/lib/math";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import NumberInput from "../number-input";
+import { usePortfolioEndpoints } from "@/lib/smart-contract/endpoints/portfolio/portfolio-hooks";
 
 const PortfolioHeader = () => {
+  const [calculatedPercent, setCalculatedPercent] = useState(0);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedSide, setSelectedSide] = useState<"WITHDRAW" | "DEPOSIT">(
     "WITHDRAW",
   );
-  const [calculatedPercent, setCalculatedPercent] = useState(0);
   const { connectWallet, error, isWalletConnected } = useSmartContractStore();
+  const { userWithdraw, userDeposit } = usePortfolioEndpoints();
 
-  const handlePercentChange = (percent: number) => {
-    const amountToPay = calculateProportion(1, percent);
+  const handleUserWithdraw = async () => {
+    const result = userWithdraw();
+  };
+  const handleUserDeposit = async () => {
+    const result = userDeposit();
+  };
 
-    const total = roundDown(times(amountToPay, 1), 1);
-    // console.log(total);
+  const handlePercentChange = (percent: number | string) => {
+    if (+percent > 100) {
+      setCalculatedPercent(100);
+    } else {
+      setCalculatedPercent(+percent);
+    }
   };
 
   useEffect(() => {
@@ -122,33 +132,48 @@ const PortfolioHeader = () => {
         setOpen={setIsOpen}
         title={selectedSide === "WITHDRAW" ? "Withdraw" : "Deposit"}
       >
-        <div className="space-y-4">
-          Are sure to {selectedSide === "WITHDRAW" ? "Withdraw" : "Deposit"}
-          {/* <NumberInput
-          label="Price"
-          maxPrecision={quotePrecision}
-          disabled={type === "market"}
-          name="price"
-          value={type === "market" ? "Market" : price}
-          onChange={(e) => handlePriceChange(e.target.value)}
-          // onDecrement={() =>
-          //   setPrice((prv) => (+prv > 0 ? (+prv - 1).toString() : "0"))
-          // }
-          // onIncrement={() =>
-          //   setPrice((prv) => (+prv > 0 ? (+prv + 1).toString() : "0"))
-          // }
-          classNames="text-center mt-1 h-[40px] line-height-[40px] order-2"
-        /> */}
+        <div>
+          Please enter the desired percentage for{" "}
+          {selectedSide === "WITHDRAW" ? "Withdraw" : "Deposit"}
+          <NumberInput
+            label="%"
+            maxPrecision={100}
+            disabled={!isWalletConnected}
+            name="Percent"
+            value={!isWalletConnected ? "Market" : calculatedPercent + ""}
+            onChange={(e) => handlePercentChange(e.target.value)}
+            onDecrement={() =>
+              setCalculatedPercent((prv) => (prv > 0 ? prv - 1 : 0))
+            }
+            onIncrement={() =>
+              setCalculatedPercent((prv) => (prv >= 0 ? prv + 1 : 0))
+            }
+            classNames="text-center mb-8 mt-4 h-[40px] line-height-[40px] order-2"
+          />
           <QuickPercentSlider
-            side={selectedSide === "WITHDRAW" ? "buy" : "sell"}
+            side={"buy"}
             percent={calculatedPercent}
             setPercent={handlePercentChange}
             disabled={false}
             className="order-4"
           />
-          <div className="flex w-full items-center justify-between">
-            <Button variant="destructive">Cancel</Button>
-            <Button>Confirm</Button>
+          <div className="mt-6 flex w-full items-center justify-around">
+            <Button
+              onClick={() => setIsOpen(false)}
+              type="button"
+              variant="destructive"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={
+                selectedSide === "WITHDRAW"
+                  ? handleUserWithdraw
+                  : handleUserDeposit
+              }
+            >
+              Confirm
+            </Button>
           </div>
         </div>
       </ResponsiveDialog>

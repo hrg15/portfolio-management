@@ -89,17 +89,30 @@ export const useAdminEndpoints = () => {
     }
   }, [contract, account, ensureConnection]);
 
-  const adminWithdrawWholeFundWETH = useCallback(async () => {
-    if (!(await ensureConnection())) return false;
+  const adminWithdrawWholeFundWETH = useCallback(
+    async (bytes: {
+      pairAddress: string[];
+      tokens: string[];
+      version: string;
+    }) => {
+      if (!(await ensureConnection())) return false;
 
-    try {
-      const result = await contract?.adminWithdrawWholeFundWETH();
-      return result;
-    } catch (error) {
-      console.log(`Error checking admin role: ${(error as Error).message}`);
-      return;
-    }
-  }, [contract, account, ensureConnection]);
+      try {
+        const result = await contract?.adminWithdrawWholeFundWETH(
+          bytes.pairAddress,
+          bytes.tokens,
+          bytes.version,
+        );
+        return result;
+      } catch (error) {
+        console.log(
+          `Admin Withdraw Whole Fund ETH Error: ${(error as Error).message}`,
+        );
+        return;
+      }
+    },
+    [contract, account, ensureConnection],
+  );
 
   const adminWithdrawWholeFund = useCallback(async () => {
     if (!(await ensureConnection())) return false;

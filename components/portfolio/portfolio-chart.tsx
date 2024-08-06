@@ -18,6 +18,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
+import { usePortfolioEndpoints } from "@/lib/smart-contract/endpoints/portfolio/portfolio-hooks";
 
 const chartData = [
   { browser: "btc", amount: 50, fill: "#E88C30" },
@@ -52,6 +53,8 @@ const chartConfig = {
 
 const PortfolioChart = () => {
   const { balance } = useSmartContractStore();
+
+  const { portfolioList } = usePortfolioEndpoints();
 
   return (
     <div>
