@@ -140,7 +140,11 @@ const PortfolioHeader = () => {
             maxPrecision={100}
             disabled={!isWalletConnected}
             name="Percent"
-            value={!isWalletConnected ? "Market" : calculatedPercent + ""}
+            value={
+              !isWalletConnected
+                ? "Connect your wallet"
+                : calculatedPercent + ""
+            }
             onChange={(e) => handlePercentChange(e.target.value)}
             onDecrement={() =>
               setCalculatedPercent((prv) => (prv > 0 ? prv - 1 : 0))
@@ -166,6 +170,7 @@ const PortfolioHeader = () => {
               Cancel
             </Button>
             <Button
+              disabled={!isWalletConnected}
               onClick={
                 selectedSide === "WITHDRAW"
                   ? handleUserWithdraw
