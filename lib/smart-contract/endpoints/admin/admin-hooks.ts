@@ -199,6 +199,22 @@ export const useAdminEndpoints = () => {
     }
   }, [contract, ensureConnection]);
 
+  const setFeeData = useCallback(
+    async (depositFee: number, withdrawFee: number) => {
+      if (!(await ensureConnection())) return false;
+
+      try {
+        const result = await contract?.setFeeData(depositFee, withdrawFee);
+        return result;
+      } catch (error) {
+        console.log(`Error checking admin role: ${(error as Error).message}`);
+        toast.error("Error occurred please try later");
+        return null;
+      }
+    },
+    [contract, ensureConnection],
+  );
+
   return {
     checkAdminRole,
     addNewTokens,
@@ -212,5 +228,6 @@ export const useAdminEndpoints = () => {
     doRebalance,
     depositRecoveryBalance,
     withdrawAccumulatedFees,
+    setFeeData,
   };
 };

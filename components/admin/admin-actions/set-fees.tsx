@@ -21,6 +21,7 @@ import { toast } from "sonner";
 const SetFees = () => {
   const [isDepositFeeOpen, setIsDepositFeeOpen] = useState(false);
   const [isWithdrawOpen, setIsWithdrawOpen] = useState(false);
+  const [isSetFeesOpen, setIsSetFeesOpen] = useState(false);
   return (
     <>
       <div>
@@ -37,6 +38,15 @@ const SetFees = () => {
             <DropdownMenuItem>
               <button
                 onClick={() => {
+                  setIsSetFeesOpen(true);
+                }}
+              >
+                Set Fees
+              </button>
+            </DropdownMenuItem>
+            {/* <DropdownMenuItem>
+              <button
+                onClick={() => {
                   setIsDepositFeeOpen(true);
                 }}
               >
@@ -51,7 +61,7 @@ const SetFees = () => {
               >
                 Set Withdraw Fee
               </button>
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             {/* <DropdownMenuItem>Set Accumulate Fee</DropdownMenuItem> */}
           </DropdownMenuContent>
         </DropdownMenu>
@@ -61,6 +71,7 @@ const SetFees = () => {
         setIsOpen={setIsDepositFeeOpen}
       />
       <SetWithdrawFee isOpen={isWithdrawOpen} setIsOpen={setIsWithdrawOpen} />
+      <SetBothFees isOpen={isSetFeesOpen} setIsOpen={setIsSetFeesOpen} />
     </>
   );
 };
@@ -119,6 +130,73 @@ const SetDepositFee = ({
             Cancel
           </Button>
           <Button onClick={handleDeposit}>Set Fee</Button>
+        </div>
+      </div>
+    </ResponsiveDialog>
+  );
+};
+
+const SetBothFees = ({
+  isOpen,
+  setIsOpen,
+}: {
+  isOpen: boolean;
+  setIsOpen: (val: boolean) => void;
+}) => {
+  const [depositFee, setDepositFee] = useState("0");
+  const [withdrawFee, setWithdrawFee] = useState("0");
+  const { setFeeData } = useAdminEndpoints();
+
+  const handleSetFees = async () => {
+    const result = await setFeeData(+depositFee, +withdrawFee);
+    if (result) {
+      toast.success("Set Fees complete successfully!");
+    }
+  };
+
+  return (
+    <ResponsiveDialog open={isOpen} setOpen={setIsOpen} title={"Set Fees"}>
+      <div className="space-y-4">
+        <div className="text-center">Please enter fees:</div>
+        <NumberInput
+          label="Deposit"
+          maxPrecision={100}
+          name="Amount"
+          value={depositFee + ""}
+          onChange={(e) => setDepositFee(e.target.value)}
+          onDecrement={() =>
+            setDepositFee((prv) => (+prv > 0 ? (+prv - 1).toString() : "0"))
+          }
+          onIncrement={() =>
+            setDepositFee((prv) => (+prv >= 0 ? (+prv + 1).toString() : "0"))
+          }
+          classNames="text-center mb-8 mt-4 h-[40px] line-height-[40px] order-2"
+        />
+        <NumberInput
+          label="Withdraw"
+          maxPrecision={100}
+          name="Amount"
+          value={withdrawFee + ""}
+          onChange={(e) => setWithdrawFee(e.target.value)}
+          onDecrement={() =>
+            setWithdrawFee((prv) => (+prv > 0 ? (+prv - 1).toString() : "0"))
+          }
+          onIncrement={() =>
+            setWithdrawFee((prv) => (+prv >= 0 ? (+prv + 1).toString() : "0"))
+          }
+          classNames="text-center mb-8 mt-4 h-[40px] line-height-[40px] order-2"
+        />
+        <div className="flex w-full items-center justify-around">
+          <Button
+            onClick={() => {
+              setIsOpen(false);
+            }}
+            type="button"
+            variant="destructive"
+          >
+            Cancel
+          </Button>
+          <Button onClick={handleSetFees}>Set Fees</Button>
         </div>
       </div>
     </ResponsiveDialog>
