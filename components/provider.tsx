@@ -8,36 +8,10 @@ import useWindowSize from "@/lib/hooks/use-window-size";
 import { Toaster } from "sonner";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import { useEffect } from "react";
+import AdminAuth from "./admin-auth";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const { isMobile } = useWindowSize();
-  const {
-    balance,
-    isConnecting,
-    connectWallet,
-    account,
-    error,
-    contract,
-    signer,
-    isWalletConnected,
-  } = useSmartContractStore();
-
-  // useEffect(() => {
-  //   const testContract = async () => {
-  //     if (contract) {
-  //       try {
-  //         const result = await contract.tokensList();
-  //         console.log("tokensList:", result);
-  //       } catch (error) {
-  //         console.log("catch", error);
-  //       }
-  //     } else {
-  //       console.log("test: Please connect wallet first.");
-  //     }
-  //   };
-
-  //   testContract();
-  // }, [isWalletConnected]);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -56,7 +30,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           className="!flex"
         />
         <TooltipProvider skipDelayDuration={0} delayDuration={0}>
-          {children}
+          <AdminAuth>{children}</AdminAuth>
         </TooltipProvider>
       </ClientSideRendering>
     </QueryClientProvider>

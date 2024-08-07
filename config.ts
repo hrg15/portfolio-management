@@ -5,5 +5,5 @@ export const DEX_SCREENER = "https://api.dexscreener.com/latest/dex";
 export const CHAIN_ID = "polygon";
 export const QUOTE_T0KEN = "WMATIC";
 
-export const codeBytes =
+export const CODE_BYTES =
   "0xf23ec0bb4210edd5cba85afd05127efcd2fc6a781bfed49188da1081670b22d8";

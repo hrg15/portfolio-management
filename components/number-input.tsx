@@ -59,6 +59,7 @@ const NumberInput: React.FC<NumberInputProps> = ({
         placeholder={placeholder || ""}
         onChange={(e) => numberInputSanitizer(e, onChange, maxPrecision)}
         maxLength={20}
+        autoComplete="off"
       />
       {onIncrement && (
         <button

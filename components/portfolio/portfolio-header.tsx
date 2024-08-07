@@ -13,36 +13,10 @@ import { cn } from "@/lib/utils";
 import NumberInput from "../number-input";
 import { usePortfolioEndpoints } from "@/lib/smart-contract/endpoints/portfolio/portfolio-hooks";
 import { MetamaskIcon } from "../icons/icons";
+import UserActions from "./user-actions/user-actions";
 
 const PortfolioHeader = () => {
-  const [calculatedPercent, setCalculatedPercent] = useState(0);
-  const [isOpen, setIsOpen] = useState(false);
-  const [selectedSide, setSelectedSide] = useState<"WITHDRAW" | "DEPOSIT">(
-    "WITHDRAW",
-  );
   const { connectWallet, error, isWalletConnected } = useSmartContractStore();
-  const { userWithdraw, userDeposit } = usePortfolioEndpoints();
-
-  const handleUserWithdraw = async () => {
-    const result = userWithdraw();
-  };
-  const handleUserDeposit = async () => {
-    const result = userDeposit();
-  };
-
-  const handlePercentChange = (percent: number | string) => {
-    if (+percent > 100) {
-      setCalculatedPercent(100);
-    } else {
-      setCalculatedPercent(+percent);
-    }
-  };
-
-  useEffect(() => {
-    if (error) {
-      toast.error("Error: " + error);
-    }
-  }, [error]);
 
   return (
     <>
@@ -101,83 +75,10 @@ const PortfolioHeader = () => {
                 crypto portfolio on Ethereum L1.
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <Button
-                onClick={() => {
-                  setSelectedSide("WITHDRAW");
-                  setIsOpen(true);
-                }}
-              >
-                Withdraw
-              </Button>
-              <Button
-                onClick={() => {
-                  setSelectedSide("DEPOSIT");
-                  setIsOpen(true);
-                }}
-                variant="outline"
-              >
-                Deposit
-              </Button>
-            </div>
+            <UserActions />
           </div>
         </div>
       </div>
-      <ResponsiveDialog
-        open={isOpen}
-        setOpen={setIsOpen}
-        title={selectedSide === "WITHDRAW" ? "Withdraw" : "Deposit"}
-      >
-        <div>
-          Please enter the desired percentage for{" "}
-          {selectedSide === "WITHDRAW" ? "Withdraw" : "Deposit"}
-          <NumberInput
-            label="%"
-            maxPrecision={100}
-            disabled={!isWalletConnected}
-            name="Percent"
-            value={
-              !isWalletConnected
-                ? "Connect your wallet"
-                : calculatedPercent + ""
-            }
-            onChange={(e) => handlePercentChange(e.target.value)}
-            onDecrement={() =>
-              setCalculatedPercent((prv) => (prv > 0 ? prv - 1 : 0))
-            }
-            onIncrement={() =>
-              setCalculatedPercent((prv) => (prv >= 0 ? prv + 1 : 0))
-            }
-            classNames="text-center mb-8 mt-4 h-[40px] line-height-[40px] order-2"
-          />
-          <QuickPercentSlider
-            side={"buy"}
-            percent={calculatedPercent}
-            setPercent={handlePercentChange}
-            disabled={false}
-            className="order-4"
-          />
-          <div className="mt-6 flex w-full items-center justify-around">
-            <Button
-              onClick={() => setIsOpen(false)}
-              type="button"
-              variant="destructive"
-            >
-              Cancel
-            </Button>
-            <Button
-              disabled={!isWalletConnected}
-              onClick={
-                selectedSide === "WITHDRAW"
-                  ? handleUserWithdraw
-                  : handleUserDeposit
-              }
-            >
-              Confirm
-            </Button>
-          </div>
-        </div>
-      </ResponsiveDialog>
     </>
   );
 };
