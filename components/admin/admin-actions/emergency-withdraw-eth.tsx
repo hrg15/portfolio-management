@@ -76,9 +76,11 @@ const EmergencyWithdrawToETH = () => {
 
   const handleWithdraw = async () => {
     const bytes = { pairAddress: pairTokens, tokens, version: "3" };
-    const result = await adminWithdrawWholeFundWETH(bytes);
-    if (result) {
-      toast.success("Withdraw complete successfully!");
+    try {
+      const result = await adminWithdrawWholeFundWETH(bytes);
+      console.log(bytes);
+    } catch (error) {
+      console.log("error:" + error);
     }
   };
 

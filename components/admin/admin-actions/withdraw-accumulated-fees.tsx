@@ -9,9 +9,11 @@ const WithdrawAccumulatedFees = () => {
   const { withdrawAccumulatedFees } = useAdminEndpoints();
 
   const handleWithdraw = async () => {
-    const result = await withdrawAccumulatedFees();
-    if (result) {
-      toast.success("Withdraw fees complete successfully!");
+    try {
+      const result = await withdrawAccumulatedFees();
+      console.log("withdrawAccumulatedFees done");
+    } catch (error) {
+      console.log("withdrawAccumulatedFees Error: " + error);
     }
   };
 

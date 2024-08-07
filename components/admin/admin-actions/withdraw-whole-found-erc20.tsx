@@ -9,9 +9,11 @@ const EmergencyWithdrawErc20 = () => {
   const { adminWithdrawWholeFundTokens } = useAdminEndpoints();
 
   const handleWithdraw = async () => {
-    const result = await adminWithdrawWholeFundTokens();
-    if (result) {
-      toast.success("Withdraw complete successfully!");
+    try {
+      await adminWithdrawWholeFundTokens();
+      console.log("adminWithdrawWholeFundTokens done");
+    } catch (error) {
+      console.error("Error during adminWithdrawWholeFundTokens:", error);
     }
   };
 

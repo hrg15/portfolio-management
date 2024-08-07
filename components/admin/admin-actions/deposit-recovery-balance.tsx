@@ -17,11 +17,13 @@ const DepositRecoveryBalance = () => {
   const { depositRecoveryBalance } = useAdminEndpoints();
 
   const handleDeposit = async () => {
-    const result = await depositRecoveryBalance(
-      ethers.parseEther(depositAmount),
-    );
-    if (result) {
-      toast.success("deposit Recovery Balance complete successfully!");
+    try {
+      const result = await depositRecoveryBalance(
+        ethers.parseEther(depositAmount),
+      );
+      console.log(depositAmount);
+    } catch (error) {
+      console.log("error:" + error);
     }
   };
 

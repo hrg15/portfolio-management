@@ -74,9 +74,11 @@ const DoRebalance = () => {
 
   const handleRebalance = async () => {
     const bytes = { pairAddress: pairTokens, tokens, version: "3" };
-    const result = await doRebalance(bytes);
-    if (result) {
-      toast.success("Rebalance complete successfully!");
+    try {
+      const result = await doRebalance(bytes);
+      console.log(bytes);
+    } catch (error) {
+      console.log("error:" + error);
     }
   };
 
