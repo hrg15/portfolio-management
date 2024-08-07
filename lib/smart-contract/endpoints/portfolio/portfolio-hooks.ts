@@ -4,7 +4,7 @@ import { ethers } from "ethers";
 import useSmartContractStore from "../../use-smart-contract";
 
 export const usePortfolioEndpoints = () => {
-  const { contract, isWalletConnected, connectWallet, account } =
+  const { contract, isWalletConnected, connectWallet } =
     useSmartContractStore();
 
   const ensureConnection = useCallback(async () => {
@@ -30,7 +30,7 @@ export const usePortfolioEndpoints = () => {
       console.log(`Error checking admin role: ${(error as Error).message}`);
       return null;
     }
-  }, [contract, account, ensureConnection]);
+  }, [contract, ensureConnection]);
 
   const userDeposit = useCallback(async () => {
     if (!(await ensureConnection())) return false;
@@ -42,7 +42,7 @@ export const usePortfolioEndpoints = () => {
       console.log(`Error checking admin role: ${(error as Error).message}`);
       return null;
     }
-  }, [contract, account, ensureConnection]);
+  }, [contract, ensureConnection]);
 
   const portfolioList = useCallback(async () => {
     if (!(await ensureConnection())) return false;
@@ -54,7 +54,7 @@ export const usePortfolioEndpoints = () => {
       console.log(`Error checking admin role: ${(error as Error).message}`);
       return null;
     }
-  }, [contract, account, ensureConnection]);
+  }, [contract, ensureConnection]);
 
   return {
     userWithdraw,

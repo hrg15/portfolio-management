@@ -23,21 +23,31 @@ import {
 import { cn } from "@/lib/utils";
 import { AddIcon, DeleteIcon } from "../icons/icons";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
+import Spinner from "../spinner";
 
 const TokensList = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [tokens, setTokens] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [tokens, setTokens] = useState<any[]>([]);
+
   const { contract, isWalletConnected } = useSmartContractStore();
   const { tokensList } = useAdminEndpoints();
   useEffect(() => {
     const getTokens = async () => {
+      setIsLoading(true);
       if (contract) {
         const result = await tokensList();
-        console.log(result);
+        const tokenAddresses = [];
+        for (let i = 0; i < result.length; i++) {
+          tokenAddresses.push(result[i]);
+        }
+        setTokens(tokenAddresses);
       }
+      setIsLoading(false);
     };
     getTokens();
   }, [isWalletConnected]);
+
   return (
     <>
       <div className="w-full">
@@ -54,25 +64,32 @@ const TokensList = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="">Symbol</TableHead>
-              <TableHead className="w-[100px]">name</TableHead>
               <TableHead className="">Address</TableHead>
-              <TableHead className="">Decimals</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell className="font-medium">BTC</TableCell>
-              <TableCell className="font-medium">Bitcoin</TableCell>
-              <TableCell className="font-medium">ajsfhds8saKJOIYd90</TableCell>
-              <TableCell className="font-medium">8</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">BTC</TableCell>
-              <TableCell className="font-medium">Bitcoin</TableCell>
-              <TableCell className="font-medium">ajsfhds8saKJOIYd90</TableCell>
-              <TableCell className="font-medium">8</TableCell>
-            </TableRow>
+            {isLoading && !tokens.length ? (
+              <TableRow className="">
+                <TableCell className="flex items-center justify-center text-center">
+                  <Spinner variant="secondary" />
+                </TableCell>
+              </TableRow>
+            ) : (
+              tokens.map((token, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-medium">{token}</TableCell>
+                  <TableCell className="text-right">
+                    <DeleteIcon
+                      className="size-5 cursor-pointer"
+                      onClick={() => {
+                        // delete token from smart contract
+                        // setTokens(tokens.filter((_, i) => i!== index));
+                      }}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

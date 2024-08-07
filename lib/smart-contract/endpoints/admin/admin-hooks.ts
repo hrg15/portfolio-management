@@ -3,8 +3,14 @@ import { toast } from "sonner";
 import { ethers } from "ethers";
 import useSmartContractStore from "../../use-smart-contract";
 
+interface IBytes {
+  pairAddress: string[];
+  tokens: string[];
+  version: string;
+}
+
 export const useAdminEndpoints = () => {
-  const { contract, isWalletConnected, connectWallet, account } =
+  const { contract, isWalletConnected, connectWallet } =
     useSmartContractStore();
 
   const ensureConnection = useCallback(async () => {
@@ -32,7 +38,7 @@ export const useAdminEndpoints = () => {
         return false;
       }
     },
-    [contract, account, ensureConnection],
+    [contract, ensureConnection],
   );
 
   const addNewTokens = useCallback(
@@ -47,7 +53,7 @@ export const useAdminEndpoints = () => {
         return false;
       }
     },
-    [contract, account, ensureConnection],
+    [contract, ensureConnection],
   );
 
   const tokensList = useCallback(async () => {
@@ -60,7 +66,7 @@ export const useAdminEndpoints = () => {
       console.log(`Error checking admin role: ${(error as Error).message}`);
       return false;
     }
-  }, [contract, account, ensureConnection]);
+  }, [contract, ensureConnection]);
 
   const addWhiteListUser = useCallback(
     async (address: string) => {
@@ -74,7 +80,7 @@ export const useAdminEndpoints = () => {
         return false;
       }
     },
-    [contract, account, ensureConnection],
+    [contract, ensureConnection],
   );
 
   const adminWithdrawWholeFundTokens = useCallback(async () => {
@@ -87,14 +93,10 @@ export const useAdminEndpoints = () => {
       console.log(`Error checking admin role: ${(error as Error).message}`);
       return;
     }
-  }, [contract, account, ensureConnection]);
+  }, [contract, ensureConnection]);
 
   const adminWithdrawWholeFundWETH = useCallback(
-    async (bytes: {
-      pairAddress: string[];
-      tokens: string[];
-      version: string;
-    }) => {
+    async (bytes: IBytes) => {
       if (!(await ensureConnection())) return false;
 
       try {
@@ -108,10 +110,11 @@ export const useAdminEndpoints = () => {
         console.log(
           `Admin Withdraw Whole Fund ETH Error: ${(error as Error).message}`,
         );
+        toast.error("Admin Withdraw Whole Fund ETH Error");
         return;
       }
     },
-    [contract, account, ensureConnection],
+    [contract, ensureConnection],
   );
 
   const adminWithdrawWholeFund = useCallback(async () => {
@@ -124,7 +127,7 @@ export const useAdminEndpoints = () => {
       console.log(`Error checking admin role: ${(error as Error).message}`);
       return;
     }
-  }, [contract, account, ensureConnection]);
+  }, [contract, ensureConnection]);
 
   const adminLiquidate = useCallback(async () => {
     if (!(await ensureConnection())) return false;
@@ -136,53 +139,68 @@ export const useAdminEndpoints = () => {
       console.log(`Error checking admin role: ${(error as Error).message}`);
       return;
     }
-  }, [contract, account, ensureConnection]);
+  }, [contract, ensureConnection]);
 
-  const deposit = useCallback(
-    async (amount: string): Promise<string | null> => {
-      if (!(await ensureConnection())) return null;
+  const pauseOrUnpause = useCallback(
+    async (val: boolean) => {
+      if (!(await ensureConnection())) return false;
 
       try {
-        const tx = await contract?.deposit({
-          value: ethers.parseEther(amount),
-        });
-        await tx.wait();
-        const newBalance = await contract?.balanceOf(account);
-        return ethers.formatEther(newBalance);
+        const result = await contract?.pauseOrUnpause(val);
+        return result;
       } catch (error) {
-        toast.error(`Deposit failed: ${(error as Error).message}`);
+        console.log(`Error checking admin role: ${(error as Error).message}`);
         return null;
       }
     },
-    [contract, account, ensureConnection],
+    [contract, ensureConnection],
   );
 
-  const withdraw = useCallback(
-    async (amount: string, toAddress?: string): Promise<string | null> => {
-      if (!(await ensureConnection())) return null;
+  const doRebalance = useCallback(
+    async (bytes: IBytes) => {
+      if (!(await ensureConnection())) return false;
 
       try {
-        let tx;
-        if (toAddress) {
-          tx = await contract?.withdrawTo(toAddress, ethers.parseEther(amount));
-        } else {
-          tx = await contract?.withdraw(ethers.parseEther(amount));
-        }
-        await tx.wait();
-        const newBalance = await contract?.balanceOf(account);
-        return ethers.formatEther(newBalance);
+        const result = await contract?.doRebalance(bytes);
+        return result;
       } catch (error) {
-        toast.error(`Withdrawal failed: ${(error as Error).message}`);
+        console.log(`Error checking admin role: ${(error as Error).message}`);
         return null;
       }
     },
-    [contract, account, ensureConnection],
+    [contract, ensureConnection],
   );
+
+  const depositRecoveryBalance = useCallback(
+    async (value: bigint) => {
+      if (!(await ensureConnection())) return false;
+
+      try {
+        const result = await contract?.depositRecoveryBalance(value);
+        return result;
+      } catch (error) {
+        console.log(`Error checking admin role: ${(error as Error).message}`);
+        return null;
+      }
+    },
+    [contract, ensureConnection],
+  );
+
+  const withdrawAccumulatedFees = useCallback(async () => {
+    if (!(await ensureConnection())) return false;
+
+    try {
+      const result = await contract?.withdrawAccumulatedFees();
+      return result;
+    } catch (error) {
+      console.log(`Error checking admin role: ${(error as Error).message}`);
+      toast.error("Error occurred please try later");
+      return null;
+    }
+  }, [contract, ensureConnection]);
 
   return {
     checkAdminRole,
-    deposit,
-    withdraw,
     addNewTokens,
     tokensList,
     addWhiteListUser,
@@ -190,5 +208,9 @@ export const useAdminEndpoints = () => {
     adminWithdrawWholeFundWETH,
     adminWithdrawWholeFund,
     adminLiquidate,
+    pauseOrUnpause,
+    doRebalance,
+    depositRecoveryBalance,
+    withdrawAccumulatedFees,
   };
 };

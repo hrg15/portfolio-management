@@ -12,6 +12,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import NumberInput from "../number-input";
 import { usePortfolioEndpoints } from "@/lib/smart-contract/endpoints/portfolio/portfolio-hooks";
+import { MetamaskIcon } from "../icons/icons";
 
 const PortfolioHeader = () => {
   const [calculatedPercent, setCalculatedPercent] = useState(0);
@@ -62,12 +63,7 @@ const PortfolioHeader = () => {
               Portfolio ReBalancer
             </h1>
             <button className="relative" onClick={() => connectWallet()}>
-              <Image
-                alt="Logo"
-                src="/assets/metamask-fox.svg"
-                width={50}
-                height={50}
-              />
+              <MetamaskIcon className="size-10" />
               <div className="absolute -right-2 -top-2">
                 <span className="relative flex h-2 w-2">
                   <span

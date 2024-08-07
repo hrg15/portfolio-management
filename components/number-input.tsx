@@ -12,7 +12,7 @@ interface NumberInputProps {
   disabled?: boolean;
   placeholder?: string;
   error?: boolean;
-  label?: string;
+  label?: string | React.ReactNode;
   classNames?: string;
   inputClass?: string;
   maxPrecision: number;

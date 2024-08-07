@@ -5,7 +5,8 @@ import Link from "next/link";
 import React, { useState } from "react";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import { cn } from "@/lib/utils";
-import AdminActions from "./admin-actions";
+import AdminActions from "./admin-actions/admin-actions";
+import { MetamaskIcon } from "../icons/icons";
 
 const AdminHeader = () => {
   const { balance, connectWallet, isWalletConnected } = useSmartContractStore();
@@ -29,13 +30,7 @@ const AdminHeader = () => {
               Portfolio ReBalancer
             </h1>
             <button className="relative" onClick={() => connectWallet()}>
-              <Image
-                alt="Logo"
-                src="/assets/metamask-fox.svg"
-                width={50}
-                height={50}
-                className="max-w-full"
-              />
+              <MetamaskIcon className="size-10" />
               <div className="absolute -right-2 -top-2">
                 <span className="relative flex h-2 w-2">
                   <span

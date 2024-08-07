@@ -20,6 +20,7 @@ import {
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
+import { toast } from "sonner";
 
 const WhiteListUsers = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -90,6 +91,7 @@ const AddUserDialog = ({
   const handleSubmitAddToken = async () => {
     if (!!input) {
       const result = await addWhiteListUser(input);
+      toast.success("User added successfully");
     }
   };
 
