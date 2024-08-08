@@ -10,13 +10,13 @@ interface IBytes {
 }
 
 export const useAdminEndpoints = () => {
-  const { contract, isWalletConnected, connectWallet } =
+  const { contract, isWalletConnected, connectWallet, contractERC20 } =
     useSmartContractStore();
 
   const ensureConnection = useCallback(async () => {
     if (!isWalletConnected) {
       toast.error("Please connect your wallet first");
-      await connectWallet();
+      // await connectWallet();
       return false;
     }
     if (!contract) {
@@ -67,6 +67,21 @@ export const useAdminEndpoints = () => {
       return false;
     }
   }, [contract, ensureConnection]);
+
+  const balanceOfToken = useCallback(
+    async (token: string) => {
+      if (!(await ensureConnection())) return false;
+
+      try {
+        const result = await contractERC20?.balanceOf(token);
+        return result;
+      } catch (error) {
+        console.log(`Error contractERC20: ${(error as Error).message}`);
+        return false;
+      }
+    },
+    [contract, ensureConnection, contractERC20],
+  );
 
   const usersList = useCallback(async () => {
     if (!(await ensureConnection())) return false;
@@ -238,5 +253,6 @@ export const useAdminEndpoints = () => {
     withdrawAccumulatedFees,
     setFeeData,
     usersList,
+    balanceOfToken,
   };
 };

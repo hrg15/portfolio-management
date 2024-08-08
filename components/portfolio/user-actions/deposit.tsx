@@ -13,7 +13,7 @@ import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-ho
 import { usePortfolioEndpoints } from "@/lib/smart-contract/endpoints/portfolio/portfolio-hooks";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import { filterTokenPairs } from "@/lib/utils";
-import { AbiCoder } from "ethers";
+import { AbiCoder, ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -71,9 +71,11 @@ const Deposit = () => {
     );
 
     try {
-      const result = await deposit(+depositAmount, encodedData);
-      console.log(+depositAmount, encodedData);
-      setIsOpen(false);
+      const result = await deposit(
+        ethers.parseUnits(depositAmount, "wei"),
+        encodedData,
+      );
+      console.log(ethers.parseUnits(depositAmount, "wei"), encodedData);
     } catch (error) {
       console.log("Error: " + error);
     }

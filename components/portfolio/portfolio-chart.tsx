@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/chart";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import { usePortfolioEndpoints } from "@/lib/smart-contract/endpoints/portfolio/portfolio-hooks";
+import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
 
 const chartData = [
   { browser: "btc", amount: 50, fill: "#E88C30" },
@@ -52,9 +53,46 @@ const chartConfig = {
 } satisfies ChartConfig;
 
 const PortfolioChart = () => {
-  const { balance } = useSmartContractStore();
+  const [isLoading, setIsLoading] = useState(true);
+  const [tokens, setTokens] = useState<any[]>([]);
 
-  const { portfolioList } = usePortfolioEndpoints();
+  const { contract, isWalletConnected, contractERC20 } =
+    useSmartContractStore();
+  const { tokensList, balanceOfToken } = useAdminEndpoints();
+
+  useEffect(() => {
+    const getTokens = async () => {
+      setIsLoading(true);
+      if (contract) {
+        const result = await tokensList();
+        const tokenAddresses = [];
+        for (let i = 0; i < result.length; i++) {
+          tokenAddresses.push(result[i]);
+        }
+        setTokens(tokenAddresses);
+      }
+      setIsLoading(false);
+    };
+
+    console.log(tokens);
+
+    getTokens();
+  }, [isWalletConnected]);
+
+  useEffect(() => {
+    const getBalance = async () => {
+      if (contractERC20) {
+        tokens.map(async (token) => {
+          const balance = await balanceOfToken(token);
+          console.log("balance", token); // replace with your own balance calculation logic
+        });
+      }
+    };
+
+    if (tokens.length > 0) {
+      getBalance();
+    }
+  }, [tokens, isWalletConnected]);
 
   return (
     <div>

@@ -93,7 +93,7 @@ const WithdrawWholeFoundEth = () => {
     <ResponsiveDialog
       open={isOpen}
       setOpen={setIsOpen}
-      title={"Withdraw Whole Fund ETH"}
+      title={"Withdraw to ETH"}
       trigger={
         <Button
           size="sm"
@@ -102,7 +102,7 @@ const WithdrawWholeFoundEth = () => {
           }}
           variant="outline"
         >
-          Emergency Withdraw to ETH
+          Withdraw to ETH
         </Button>
       }
     >

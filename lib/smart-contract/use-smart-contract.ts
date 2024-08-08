@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { ethers } from "ethers";
 import contractABI from "@/lib/smart-contract/ABI.json";
+import contractERC20ABI from "@/lib/smart-contract/ERC20_ABI.json";
 import USDT_ABI from "@/lib/smart-contract/USDT_ABI.json";
 import { toast } from "sonner";
 
@@ -13,6 +14,7 @@ interface BlockchainState {
   signer: ethers.Signer | null;
   account: string | null;
   contract: ethers.Contract | null;
+  contractERC20: ethers.Contract | null;
   balance: string;
   isConnecting: boolean;
   isWalletConnected: boolean;
@@ -26,6 +28,7 @@ const useSmartContractStore = create<BlockchainState>((set, get) => ({
   signer: null,
   account: null,
   contract: null,
+  contractERC20: null,
   balance: "0",
   isConnecting: false,
   isWalletConnected: false,
@@ -87,12 +90,18 @@ const useSmartContractStore = create<BlockchainState>((set, get) => ({
           contractABI.abi,
           signer,
         );
+        const contractERC20Instance = new ethers.Contract(
+          contractAddress,
+          contractERC20ABI,
+          signer,
+        );
 
         set({
           provider,
           signer,
           account: address,
           contract: contractInstance,
+          contractERC20: contractERC20Instance,
           isConnecting: false,
           isWalletConnected: true,
         });

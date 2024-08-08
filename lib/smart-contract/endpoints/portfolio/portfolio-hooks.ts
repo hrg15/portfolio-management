@@ -15,7 +15,7 @@ export const usePortfolioEndpoints = () => {
   const ensureConnection = useCallback(async () => {
     if (!isWalletConnected) {
       toast.error("Please connect your wallet first");
-      await connectWallet();
+      // await connectWallet();
       return false;
     }
     if (!contract) {
@@ -68,7 +68,7 @@ export const usePortfolioEndpoints = () => {
   );
 
   const deposit = useCallback(
-    async (ethAmount: number, bytes: any) => {
+    async (ethAmount: any, bytes: any) => {
       if (!(await ensureConnection())) return false;
 
       try {
