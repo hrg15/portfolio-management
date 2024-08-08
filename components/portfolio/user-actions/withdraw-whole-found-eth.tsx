@@ -59,7 +59,7 @@ const WithdrawWholeFoundEth = () => {
       },
     },
     {
-      enabled: isOpen && isWalletConnected,
+      enabled: isOpen && tokens.length > 0,
     },
   );
 

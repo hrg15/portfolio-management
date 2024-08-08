@@ -51,7 +51,7 @@ const Deposit = () => {
       },
     },
     {
-      enabled: isOpen && isWalletConnected,
+      enabled: isOpen && tokens.length > 0,
     },
   );
 
@@ -70,12 +70,11 @@ const Deposit = () => {
       [pairTokens, tokens, version],
     );
 
+    const amountInWei = ethers.parseUnits(depositAmount, 18);
+
     try {
-      const result = await deposit(
-        ethers.parseUnits(depositAmount, "wei"),
-        encodedData,
-      );
-      console.log(ethers.parseUnits(depositAmount, "wei"), encodedData);
+      const result = await deposit(amountInWei, encodedData);
+      console.log(amountInWei, encodedData);
     } catch (error) {
       console.log("Error: " + error);
     }

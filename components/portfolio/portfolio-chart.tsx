@@ -74,8 +74,6 @@ const PortfolioChart = () => {
       setIsLoading(false);
     };
 
-    console.log(tokens);
-
     getTokens();
   }, [isWalletConnected]);
 
@@ -84,7 +82,7 @@ const PortfolioChart = () => {
       if (contractERC20) {
         tokens.map(async (token) => {
           const balance = await balanceOfToken(token);
-          console.log("balance", token); // replace with your own balance calculation logic
+          // console.log("balance", token); // replace with your own balance calculation logic
         });
       }
     };
