@@ -7,6 +7,7 @@ import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import { cn } from "@/lib/utils";
 import AdminActions from "./admin-actions/admin-actions";
 import { MetamaskIcon } from "../icons/icons";
+import ConnectionButton from "../connection-button";
 
 const AdminHeader = () => {
   const { balance, connectWallet, isWalletConnected } = useSmartContractStore();
@@ -29,27 +30,7 @@ const AdminHeader = () => {
             <h1 className="hidden text-2xl font-bold text-white md:block">
               Portfolio ReBalancer
             </h1>
-            <button className="relative" onClick={() => connectWallet()}>
-              <MetamaskIcon className="size-10" />
-              <div className="absolute -right-2 -top-2">
-                <span className="relative flex h-2 w-2">
-                  <span
-                    className={cn(
-                      "absolute inline-flex h-full w-full rounded-full opacity-75",
-                      isWalletConnected
-                        ? "animate-ping bg-sky-400"
-                        : "bg-error",
-                    )}
-                  ></span>
-                  <span
-                    className={cn(
-                      "relative inline-flex h-2 w-2 rounded-full",
-                      isWalletConnected ? "bg-sky-500" : "bg-error",
-                    )}
-                  ></span>
-                </span>
-              </div>
-            </button>
+            <ConnectionButton />
           </div>
           <div className="space-y-12">
             <Image

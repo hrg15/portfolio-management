@@ -9,9 +9,11 @@ const PauseUnpause = () => {
   const { pauseOrUnpause } = useAdminEndpoints();
 
   const handlePause = async (val: boolean) => {
-    const result = await pauseOrUnpause(val);
-    if (result) {
-      toast.success("Pause complete successfully!");
+    try {
+      const result = await pauseOrUnpause(val);
+      setIsOpen(false);
+    } catch (error) {
+      console.log("Error: " + error);
     }
   };
 

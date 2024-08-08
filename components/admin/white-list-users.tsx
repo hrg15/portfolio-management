@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableBody,
@@ -21,9 +21,33 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
 import { toast } from "sonner";
+import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
+import Spinner from "../spinner";
 
 const WhiteListUsers = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [users, setUsers] = useState<any[]>([]);
+
+  const { addWhiteListUser, usersList } = useAdminEndpoints();
+  const { contract, isWalletConnected } = useSmartContractStore();
+
+  useEffect(() => {
+    const getUsers = async () => {
+      setIsLoading(true);
+      if (contract) {
+        const result = await usersList();
+        const userAddress = [];
+        for (let i = 0; i < result.length; i++) {
+          userAddress.push(result[i]);
+        }
+        setUsers(userAddress);
+      }
+      setIsLoading(false);
+    };
+    getUsers();
+  }, [isWalletConnected]);
+
   return (
     <>
       <div className="w-full">
@@ -40,29 +64,29 @@ const WhiteListUsers = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[100px]">User</TableHead>
+              <TableHead className="w-[100px]">Users</TableHead>
               <TableHead className="text-right"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell className="font-medium">User 1</TableCell>
-
-              <TableCell className="text-right">
-                <button>
-                  <DeleteIcon className="size-6" />
-                </button>
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="font-medium">User 1</TableCell>
-
-              <TableCell className="text-right">
-                <button>
-                  <DeleteIcon className="size-6" />
-                </button>
-              </TableCell>
-            </TableRow>
+            {isLoading && !users.length ? (
+              <TableRow className="">
+                <TableCell className="flex items-center justify-center text-center">
+                  <Spinner variant="secondary" />
+                </TableCell>
+              </TableRow>
+            ) : (
+              users.map((token, index) => (
+                <TableRow key={index}>
+                  <TableCell className="font-medium">{token}</TableCell>
+                  <TableCell className="text-right">
+                    <button>
+                      <DeleteIcon className="size-6 hover:text-error" />
+                    </button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
@@ -81,17 +105,19 @@ const AddUserDialog = ({
   setIsOpen: (val: boolean) => void;
 }) => {
   const [input, setInput] = useState("");
-
   const { addWhiteListUser } = useAdminEndpoints();
 
   const handleInputChange = (value: string) => {
     setInput(value);
   };
-
   const handleSubmitAddToken = async () => {
     if (!!input) {
-      const result = await addWhiteListUser(input);
-      toast.success("User added successfully");
+      try {
+        const result = await addWhiteListUser(input);
+        setIsOpen(false);
+      } catch (error) {
+        console.log("Error", error);
+      }
     }
   };
 

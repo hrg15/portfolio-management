@@ -10,8 +10,8 @@ const EmergencyWithdrawErc20 = () => {
 
   const handleWithdraw = async () => {
     try {
-      await adminWithdrawWholeFundTokens();
-      console.log("adminWithdrawWholeFundTokens done");
+      const result = await adminWithdrawWholeFundTokens();
+      setIsOpen(false);
     } catch (error) {
       console.error("Error during adminWithdrawWholeFundTokens:", error);
     }

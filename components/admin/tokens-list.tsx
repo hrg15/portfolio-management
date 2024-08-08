@@ -78,15 +78,6 @@ const TokensList = () => {
               tokens.map((token, index) => (
                 <TableRow key={index}>
                   <TableCell className="font-medium">{token}</TableCell>
-                  <TableCell className="text-right">
-                    <DeleteIcon
-                      className="size-5 cursor-pointer"
-                      onClick={() => {
-                        // delete token from smart contract
-                        // setTokens(tokens.filter((_, i) => i!== index));
-                      }}
-                    />
-                  </TableCell>
                 </TableRow>
               ))
             )}

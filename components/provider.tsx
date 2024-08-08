@@ -5,7 +5,7 @@ import { TooltipProvider } from "./ui/tooltip";
 import ClientSideRendering from "./client-side-rendering";
 import { queryClient } from "@/lib/query-client";
 import useWindowSize from "@/lib/hooks/use-window-size";
-import { Toaster } from "sonner";
+import { toast, Toaster } from "sonner";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import { useEffect } from "react";
 import AdminAuth from "./admin-auth";
@@ -23,12 +23,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
           closeButton
           richColors
           toastOptions={{
+            classNames: {
+              closeButton: "!bg-neutral-900 !border-none",
+            },
             style: {
               border: "border 1px solid #242b33",
             },
           }}
           className="!flex"
         />
+
         <TooltipProvider skipDelayDuration={0} delayDuration={0}>
           <AdminAuth>{children}</AdminAuth>
         </TooltipProvider>

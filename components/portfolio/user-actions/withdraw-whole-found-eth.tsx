@@ -11,6 +11,8 @@ import { tokensHooks } from "@/lib/endpoints/tokens-endpoints";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
 import { usePortfolioEndpoints } from "@/lib/smart-contract/endpoints/portfolio/portfolio-hooks";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
+import { filterTokenPairs } from "@/lib/utils";
+import { AbiCoder } from "ethers";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -50,27 +52,6 @@ const WithdrawWholeFoundEth = () => {
     getTokens();
   }, [isWalletConnected]);
 
-  const filterTokenPairs = (pairs: IPairs[]) => {
-    const filteredPairs = pairs.filter(
-      (pair) =>
-        pair.chainId === CHAIN_ID &&
-        pair.dexId === "uniswap" &&
-        pair.quoteToken.symbol === QUOTE_T0KEN,
-    );
-    const groupedPairs: { [key: string]: IPairs } = {};
-
-    filteredPairs.forEach((pair) => {
-      const key = `${pair.baseToken.address}-${pair.quoteToken.address}`;
-      if (
-        !groupedPairs[key] ||
-        (pair.liquidity?.usd || 0) > (groupedPairs[key].liquidity?.usd || 0)
-      ) {
-        groupedPairs[key] = pair;
-      }
-    });
-    return Object.values(groupedPairs).map((pair) => pair.pairAddress);
-  };
-
   const { data, isLoading } = tokensHooks.useQueryPairTokens(
     {
       params: {
@@ -78,7 +59,7 @@ const WithdrawWholeFoundEth = () => {
       },
     },
     {
-      enabled: isOpen,
+      enabled: isOpen && isWalletConnected,
     },
   );
 
@@ -89,11 +70,22 @@ const WithdrawWholeFoundEth = () => {
   }, [data?.pairs]);
 
   const handleUserWithdrawEth = async () => {
-    const bytes = { pairAddress: pairTokens, tokens, version: 3 };
-    console.log(bytes, calculatedPercent);
-    const result = await userWithdrawWholeFundWETH(bytes, calculatedPercent);
-    if (result) {
-      toast.success("Withdraw complete successfully!");
+    const version = tokens.map((t) => "3");
+
+    const abiCoder = new AbiCoder();
+    const encodedData = abiCoder.encode(
+      ["address[]", "address[]", "string[]"],
+      [pairTokens, tokens, version],
+    );
+
+    try {
+      const result = await userWithdrawWholeFundWETH(
+        encodedData,
+        calculatedPercent,
+      );
+      setIsOpen(false);
+    } catch (error) {
+      console.log("Error", error);
     }
   };
 

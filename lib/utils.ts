@@ -1,5 +1,7 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { IPairs } from "./endpoints/schemas";
+import { CHAIN_ID, QUOTE_T0KEN } from "@/config";
 // import { isValidNumber } from "./math";
 
 export function cn(...inputs: ClassValue[]) {
@@ -185,3 +187,25 @@ export function monthDate() {
   const dateRange = `${lastMonthName} - ${currentMonthName}${currentYear}`;
   return dateRange;
 }
+
+export const filterTokenPairs = (pairs: IPairs[]) => {
+  const filteredPairs = pairs.filter(
+    (pair) =>
+      pair.chainId === CHAIN_ID &&
+      pair.dexId === "uniswap" &&
+      pair.quoteToken.symbol === QUOTE_T0KEN,
+  );
+
+  // const groupedPairs: { [key: string]: IPairs } = {};
+  // filteredPairs.forEach((pair) => {
+  //   const key = `${pair.baseToken.address}-${pair.quoteToken.address}`;
+  //   if (
+  //     !groupedPairs[key] ||
+  //     (pair.liquidity?.usd || 0) > (groupedPairs[key].liquidity?.usd || 0)
+  //   ) {
+  //     groupedPairs[key] = pair;
+  //   }
+  // });
+  // return Object.values(groupedPairs).map((pair) => pair.pairAddress);
+  return filteredPairs.map((pair) => pair.pairAddress);
+};

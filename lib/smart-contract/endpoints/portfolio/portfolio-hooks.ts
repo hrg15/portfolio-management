@@ -32,7 +32,7 @@ export const usePortfolioEndpoints = () => {
       const result = await contract?.withdrawAllInKind();
       return result;
     } catch (error) {
-      console.log(`Error checking admin role: ${(error as Error).message}`);
+      console.log(`Error : ${(error as Error).message}`);
       return null;
     }
   }, [contract, ensureConnection]);
@@ -50,11 +50,14 @@ export const usePortfolioEndpoints = () => {
   }, [contract, ensureConnection]);
 
   const userWithdrawWholeFundWETH = useCallback(
-    async (bytes: IBytes, percentage: number) => {
+    async (bytes: any, percentage: number) => {
       if (!(await ensureConnection())) return false;
 
       try {
-        const result = await contract?.userWithdrawWholeFundWETH();
+        const result = await contract?.userWithdrawWholeFundWETH(
+          bytes,
+          percentage,
+        );
         return result;
       } catch (error) {
         console.log(`Error : ${(error as Error).message}`);
@@ -65,11 +68,11 @@ export const usePortfolioEndpoints = () => {
   );
 
   const deposit = useCallback(
-    async (ethAmount: number, bytes: IBytes) => {
+    async (ethAmount: number, bytes: any) => {
       if (!(await ensureConnection())) return false;
 
       try {
-        const result = await contract?.deposit();
+        const result = await contract?.deposit(ethAmount, bytes);
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);

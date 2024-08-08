@@ -19,8 +19,6 @@ interface BlockchainState {
   error: string | null;
   connectWallet: () => Promise<void>;
   disconnect: () => void;
-  deposit: (amount: string) => Promise<void>;
-  withdraw: (amount: string, toAddress?: string) => Promise<void>;
 }
 
 const useSmartContractStore = create<BlockchainState>((set, get) => ({
@@ -115,39 +113,6 @@ const useSmartContractStore = create<BlockchainState>((set, get) => ({
       balance: "0",
       isWalletConnected: false,
     });
-  },
-
-  deposit: async (amount: string) => {
-    const { contract, account } = get();
-    if (contract && amount) {
-      try {
-        const tx = await contract.deposit({ value: ethers.parseEther(amount) });
-        await tx.wait();
-        const newBalance = await contract.balanceOf(account);
-        set({ balance: ethers.formatEther(newBalance) });
-      } catch (error) {
-        set({ error: (error as Error).message });
-      }
-    }
-  },
-
-  withdraw: async (amount: string, toAddress?: string) => {
-    const { contract, account } = get();
-    if (contract && amount) {
-      try {
-        let tx;
-        if (toAddress) {
-          tx = await contract.withdrawTo(toAddress, ethers.parseEther(amount));
-        } else {
-          tx = await contract.withdraw(ethers.parseEther(amount));
-        }
-        await tx.wait();
-        const newBalance = await contract.balanceOf(account);
-        set({ balance: ethers.formatEther(newBalance) });
-      } catch (error) {
-        set({ error: (error as Error).message });
-      }
-    }
   },
 }));
 

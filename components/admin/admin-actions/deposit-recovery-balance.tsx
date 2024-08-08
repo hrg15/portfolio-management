@@ -21,6 +21,7 @@ const DepositRecoveryBalance = () => {
       const result = await depositRecoveryBalance(
         ethers.parseEther(depositAmount),
       );
+      setIsOpen(false);
       console.log(depositAmount);
     } catch (error) {
       console.log("error:" + error);

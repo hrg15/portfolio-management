@@ -68,6 +68,18 @@ export const useAdminEndpoints = () => {
     }
   }, [contract, ensureConnection]);
 
+  const usersList = useCallback(async () => {
+    if (!(await ensureConnection())) return false;
+
+    try {
+      const result = await contract?.usersList();
+      return result;
+    } catch (error) {
+      console.log(`Error checking admin role: ${(error as Error).message}`);
+      return false;
+    }
+  }, [contract, ensureConnection]);
+
   const addWhiteListUser = useCallback(
     async (address: string) => {
       if (!(await ensureConnection())) return false;
@@ -96,15 +108,11 @@ export const useAdminEndpoints = () => {
   }, [contract, ensureConnection]);
 
   const adminWithdrawWholeFundWETH = useCallback(
-    async (bytes: IBytes) => {
+    async (bytes: any) => {
       if (!(await ensureConnection())) return false;
 
       try {
-        const result = await contract?.adminWithdrawWholeFundWETH(
-          bytes.pairAddress,
-          bytes.tokens,
-          bytes.version,
-        );
+        const result = await contract?.adminWithdrawWholeFundWETH(bytes);
         return result;
       } catch (error) {
         console.log(
@@ -157,7 +165,7 @@ export const useAdminEndpoints = () => {
   );
 
   const doRebalance = useCallback(
-    async (bytes: IBytes) => {
+    async (bytes: any) => {
       if (!(await ensureConnection())) return false;
 
       try {
@@ -229,5 +237,6 @@ export const useAdminEndpoints = () => {
     depositRecoveryBalance,
     withdrawAccumulatedFees,
     setFeeData,
+    usersList,
   };
 };

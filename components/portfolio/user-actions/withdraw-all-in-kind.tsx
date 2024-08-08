@@ -11,10 +11,11 @@ const WithdrawAllInKind = () => {
   const { withdrawAllInKind } = usePortfolioEndpoints();
 
   const handleWithdraw = async () => {
-    const result = await withdrawAllInKind();
-    console.log("result");
-    if (result) {
-      toast.success("Withdraw complete successfully!");
+    try {
+      const result = await withdrawAllInKind();
+      setIsOpen(false);
+    } catch (error) {
+      console.log("error", error);
     }
   };
 

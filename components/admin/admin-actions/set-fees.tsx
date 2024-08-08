@@ -148,9 +148,11 @@ const SetBothFees = ({
   const { setFeeData } = useAdminEndpoints();
 
   const handleSetFees = async () => {
-    const result = await setFeeData(+depositFee, +withdrawFee);
-    if (result) {
-      toast.success("Set Fees complete successfully!");
+    try {
+      const result = await setFeeData(+depositFee, +withdrawFee);
+      setIsOpen(false);
+    } catch (error) {
+      console.log("Error", error);
     }
   };
 
@@ -214,11 +216,13 @@ const SetWithdrawFee = ({
   const { depositRecoveryBalance } = useAdminEndpoints();
 
   const handleDeposit = async () => {
-    const result = await depositRecoveryBalance(
-      ethers.parseEther(depositAmount),
-    );
-    if (result) {
-      toast.success("Withdraw Recovery Balance complete successfully!");
+    try {
+      const result = await depositRecoveryBalance(
+        ethers.parseEther(depositAmount),
+      );
+      setIsOpen(false);
+    } catch (error) {
+      console.log("Error", error);
     }
   };
 

@@ -11,7 +11,7 @@ const WithdrawAccumulatedFees = () => {
   const handleWithdraw = async () => {
     try {
       const result = await withdrawAccumulatedFees();
-      console.log("withdrawAccumulatedFees done");
+      setIsOpen(false);
     } catch (error) {
       console.log("withdrawAccumulatedFees Error: " + error);
     }
