@@ -53,7 +53,7 @@ const EmergencyWithdrawToETH = () => {
     tokensHooks.useQueryPairTokens(
       {
         params: {
-          token: USDC_T0KEN,
+          token: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
         },
       },
       {
@@ -70,22 +70,18 @@ const EmergencyWithdrawToETH = () => {
   useEffect(() => {
     if (usdcPairs?.pairs) {
       setUsdcPairTokens(filterUSDCTokenPairs(usdcPairs.pairs));
-      // setPairTokens((prv) => [
-      //   ...prv,
-      //   filterUSDCTokenPairs(usdcPairs?.pairs || []).join(","),
-      // ]);
     }
   }, [usdcPairs?.pairs, tokens]);
 
   const handleWithdraw = async () => {
-    const version = pairTokens.map((t) => "3");
+    const pairAddress = [...pairTokens, usdcPairTokens[0]];
+    const version = pairAddress.map((t) => "3");
 
     const abiCoder = new AbiCoder();
     const encodedData = abiCoder.encode(
       ["address[]", "string[]"],
-      [pairTokens, version],
+      [pairAddress, version],
     );
-    console.log([pairTokens, version]);
 
     try {
       const result = await adminWithdrawWholeFundWETH(encodedData);

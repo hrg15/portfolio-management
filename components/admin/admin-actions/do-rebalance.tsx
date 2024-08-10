@@ -6,7 +6,7 @@ import { IPairs } from "@/lib/endpoints/schemas";
 import { tokensHooks } from "@/lib/endpoints/tokens-endpoints";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
-import { filterTokenPairs } from "@/lib/utils";
+import { filterTokenPairs, filterUSDCTokenPairs } from "@/lib/utils";
 import { AbiCoder } from "ethers";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -15,21 +15,11 @@ const DoRebalance = () => {
   const [pairTokens, setPairTokens] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoadingTokens, setIsLoadingTokens] = useState(false);
+  const [usdcPairTokens, setUsdcPairTokens] = useState<string[]>([]);
   const [tokens, setTokens] = useState<any[]>([]);
 
   const { doRebalance, tokensList } = useAdminEndpoints();
   const { contract, isWalletConnected } = useSmartContractStore();
-
-  const { data, isLoading } = tokensHooks.useQueryPairTokens(
-    {
-      params: {
-        token: tokens.join(","),
-      },
-    },
-    {
-      enabled: isOpen,
-    },
-  );
 
   useEffect(() => {
     const getTokens = async () => {
@@ -47,19 +37,50 @@ const DoRebalance = () => {
     getTokens();
   }, [isWalletConnected]);
 
+  const { data, isLoading } = tokensHooks.useQueryPairTokens(
+    {
+      params: {
+        token: tokens.join(","),
+      },
+    },
+    {
+      enabled: isOpen,
+    },
+  );
+  const { data: usdcPairs, isLoading: usdcPairsLoading } =
+    tokensHooks.useQueryPairTokens(
+      {
+        params: {
+          token: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+        },
+      },
+      {
+        enabled: isOpen,
+      },
+    );
+
   useEffect(() => {
     if (data?.pairs) {
       setPairTokens(filterTokenPairs(data.pairs, tokens));
     }
   }, [data?.pairs, tokens]);
 
+  useEffect(() => {
+    if (usdcPairs?.pairs) {
+      setUsdcPairTokens(filterUSDCTokenPairs(usdcPairs.pairs));
+    }
+  }, [usdcPairs?.pairs, tokens]);
+
   const handleRebalance = async () => {
-    const version = tokens.map((t) => "3");
+    const pairAddress = [...pairTokens, usdcPairTokens[0]];
+    const version = pairAddress.map((t) => "3");
+
     const abiCoder = new AbiCoder();
     const encodedData = abiCoder.encode(
-      ["address[]", "address[]", "string[]"],
-      [pairTokens, tokens, version],
+      ["address[]", "string[]"],
+      [pairAddress, version],
     );
+
     try {
       const result = await doRebalance(encodedData);
       setIsOpen(false);

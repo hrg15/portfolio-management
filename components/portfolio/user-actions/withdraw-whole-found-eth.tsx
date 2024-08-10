@@ -11,7 +11,7 @@ import { tokensHooks } from "@/lib/endpoints/tokens-endpoints";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
 import { usePortfolioEndpoints } from "@/lib/smart-contract/endpoints/portfolio/portfolio-hooks";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
-import { filterTokenPairs } from "@/lib/utils";
+import { filterTokenPairs, filterUSDCTokenPairs } from "@/lib/utils";
 import { AbiCoder } from "ethers";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -21,6 +21,7 @@ const WithdrawWholeFoundEth = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoadingTokens, setIsLoadingTokens] = useState(false);
   const [tokens, setTokens] = useState<any[]>([]);
+  const [usdcPairTokens, setUsdcPairTokens] = useState<string[]>([]);
 
   const [calculatedPercent, setCalculatedPercent] = useState(0);
 
@@ -59,9 +60,20 @@ const WithdrawWholeFoundEth = () => {
       },
     },
     {
-      enabled: isOpen && tokens.length > 0,
+      enabled: isOpen,
     },
   );
+  const { data: usdcPairs, isLoading: usdcPairsLoading } =
+    tokensHooks.useQueryPairTokens(
+      {
+        params: {
+          token: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+        },
+      },
+      {
+        enabled: isOpen,
+      },
+    );
 
   useEffect(() => {
     if (data?.pairs) {
@@ -69,14 +81,23 @@ const WithdrawWholeFoundEth = () => {
     }
   }, [data?.pairs, tokens]);
 
+  useEffect(() => {
+    if (usdcPairs?.pairs) {
+      setUsdcPairTokens(filterUSDCTokenPairs(usdcPairs.pairs));
+    }
+  }, [usdcPairs?.pairs, tokens]);
+
   const handleUserWithdrawEth = async () => {
-    const version = tokens.map((t) => "3");
+    const pairAddress = [...pairTokens, usdcPairTokens[0]];
+    const version = pairAddress.map((t) => "3");
 
     const abiCoder = new AbiCoder();
     const encodedData = abiCoder.encode(
-      ["address[]", "address[]", "string[]"],
-      [pairTokens, tokens, version],
+      ["address[]", "string[]"],
+      [pairAddress, version],
     );
+
+    console.log([pairAddress, version], calculatedPercent);
 
     try {
       const result = await userWithdrawWholeFundWETH(
@@ -141,10 +162,18 @@ const WithdrawWholeFoundEth = () => {
             Cancel
           </Button>
           <Button
-            disabled={!isWalletConnected || isLoading || isLoadingTokens}
+            disabled={
+              !isWalletConnected ||
+              isLoading ||
+              isLoadingTokens ||
+              usdcPairsLoading
+            }
             onClick={handleUserWithdrawEth}
           >
-            {!isWalletConnected || isLoading || isLoadingTokens ? (
+            {!isWalletConnected ||
+            isLoading ||
+            isLoadingTokens ||
+            usdcPairsLoading ? (
               <Spinner variant="secondary" />
             ) : (
               "Confirm"

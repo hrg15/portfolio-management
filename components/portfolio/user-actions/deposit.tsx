@@ -12,7 +12,7 @@ import { tokensHooks } from "@/lib/endpoints/tokens-endpoints";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
 import { usePortfolioEndpoints } from "@/lib/smart-contract/endpoints/portfolio/portfolio-hooks";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
-import { filterTokenPairs } from "@/lib/utils";
+import { filterTokenPairs, filterUSDCTokenPairs } from "@/lib/utils";
 import { AbiCoder, ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -23,6 +23,7 @@ const Deposit = () => {
   const [isLoadingTokens, setIsLoadingTokens] = useState(false);
   const [tokens, setTokens] = useState<any[]>([]);
   const [depositAmount, setDepositAmount] = useState("0");
+  const [usdcPairTokens, setUsdcPairTokens] = useState<string[]>([]);
 
   const { contract, isWalletConnected } = useSmartContractStore();
   const { deposit } = usePortfolioEndpoints();
@@ -51,9 +52,20 @@ const Deposit = () => {
       },
     },
     {
-      enabled: isOpen && tokens.length > 0,
+      enabled: isOpen,
     },
   );
+  const { data: usdcPairs, isLoading: usdcPairsLoading } =
+    tokensHooks.useQueryPairTokens(
+      {
+        params: {
+          token: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+        },
+      },
+      {
+        enabled: isOpen,
+      },
+    );
 
   useEffect(() => {
     if (data?.pairs) {
@@ -61,13 +73,20 @@ const Deposit = () => {
     }
   }, [data?.pairs, tokens]);
 
+  useEffect(() => {
+    if (usdcPairs?.pairs) {
+      setUsdcPairTokens(filterUSDCTokenPairs(usdcPairs.pairs));
+    }
+  }, [usdcPairs?.pairs, tokens]);
+
   const handleDeposit = async () => {
-    const version = tokens.map((t) => "3");
+    const pairAddress = [...pairTokens, usdcPairTokens[0]];
+    const version = pairAddress.map((t) => "3");
 
     const abiCoder = new AbiCoder();
     const encodedData = abiCoder.encode(
       ["address[]", "string[]"],
-      [pairTokens, version],
+      [pairAddress, version],
     );
 
     const amountInWei = ethers.parseUnits(depositAmount, 18);

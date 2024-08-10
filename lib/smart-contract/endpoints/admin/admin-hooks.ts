@@ -237,6 +237,20 @@ export const useAdminEndpoints = () => {
     },
     [contract, ensureConnection],
   );
+  const removeWhitelisted = useCallback(
+    async (address: string) => {
+      if (!(await ensureConnection())) return false;
+
+      try {
+        const result = await contract?.removeWhitelisted(address);
+        return result;
+      } catch (error) {
+        console.log(`Error checking admin role: ${(error as Error).message}`);
+        return null;
+      }
+    },
+    [contract, ensureConnection],
+  );
 
   return {
     checkAdminRole,
@@ -254,5 +268,6 @@ export const useAdminEndpoints = () => {
     setFeeData,
     usersList,
     balanceOfToken,
+    removeWhitelisted,
   };
 };

@@ -23,13 +23,16 @@ import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-ho
 import { toast } from "sonner";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import Spinner from "../spinner";
+import { ResponsiveDialog } from "../responsive-dialog";
 
 const WhiteListUsers = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<string | null>("");
   const [isLoading, setIsLoading] = useState(true);
   const [users, setUsers] = useState<any[]>([]);
 
-  const { addWhiteListUser, usersList } = useAdminEndpoints();
+  const { removeWhitelisted, usersList } = useAdminEndpoints();
   const { contract, isWalletConnected } = useSmartContractStore();
 
   useEffect(() => {
@@ -47,6 +50,11 @@ const WhiteListUsers = () => {
     };
     getUsers();
   }, [isWalletConnected]);
+
+  const handleOpenDialog = (address: string) => {
+    setSelectedUser(address);
+    setIsRemoveDialogOpen(true);
+  };
 
   return (
     <>
@@ -76,11 +84,11 @@ const WhiteListUsers = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              users.map((token, index) => (
+              users.map((user, index) => (
                 <TableRow key={index}>
-                  <TableCell className="font-medium">{token}</TableCell>
+                  <TableCell className="font-medium">{user}</TableCell>
                   <TableCell className="text-right">
-                    <button>
+                    <button onClick={() => handleOpenDialog(user)}>
                       <DeleteIcon className="size-6 hover:text-error" />
                     </button>
                   </TableCell>
@@ -91,6 +99,11 @@ const WhiteListUsers = () => {
         </Table>
       </div>
       <AddUserDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+      <RemoveUserDialog
+        isOpen={isRemoveDialogOpen}
+        setIsOpen={setIsRemoveDialogOpen}
+        address={selectedUser || ""}
+      />
     </>
   );
 };
@@ -145,5 +158,46 @@ const AddUserDialog = ({
         </Button>
       </DialogContent>
     </Dialog>
+  );
+};
+
+const RemoveUserDialog = ({
+  isOpen,
+  setIsOpen,
+  address,
+}: {
+  isOpen: boolean;
+  setIsOpen: (val: boolean) => void;
+  address: string;
+}) => {
+  const { removeWhitelisted } = useAdminEndpoints();
+
+  const handleDeleteUser = async () => {
+    try {
+      const result = await removeWhitelisted(address);
+      setIsOpen(false);
+    } catch (error) {
+      console.log("Error remove user", error);
+    }
+  };
+
+  return (
+    <ResponsiveDialog open={isOpen} setOpen={setIsOpen} title="Remove User">
+      <div className="space-y-4">
+        <div className="text-center">Are sure to remove this user?</div>
+        <div className="flex w-full items-center justify-around">
+          <Button
+            onClick={() => {
+              setIsOpen(false);
+            }}
+            type="button"
+            variant="destructive"
+          >
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteUser}>Remove</Button>
+        </div>
+      </div>
+    </ResponsiveDialog>
   );
 };

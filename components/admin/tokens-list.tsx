@@ -37,6 +37,7 @@ const TokensList = () => {
       setIsLoading(true);
       if (contract) {
         const result = await tokensList();
+        console.log(result);
         const tokenAddresses = [];
         for (let i = 0; i < result.length; i++) {
           tokenAddresses.push(result[i]);
@@ -123,6 +124,7 @@ const AddTokenDialog = ({
   const handleSubmitAddToken = async () => {
     if (!!addresses.length) {
       const result = await addNewTokens(addresses);
+      setIsOpen(false);
     }
   };
 

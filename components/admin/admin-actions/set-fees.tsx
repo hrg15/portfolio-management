@@ -156,12 +156,18 @@ const SetBothFees = ({
     }
   };
 
+  // const handleChangePercentage = (val:string) => {
+  //   if(+val > 100){
+
+  //   }
+  //  }
+
   return (
     <ResponsiveDialog open={isOpen} setOpen={setIsOpen} title={"Set Fees"}>
       <div className="space-y-4">
         <div className="text-center">Please enter fees:</div>
         <NumberInput
-          label="Deposit"
+          label="Deposit%"
           maxPrecision={100}
           name="Amount"
           value={depositFee + ""}
@@ -175,7 +181,7 @@ const SetBothFees = ({
           classNames="text-center mb-8 mt-4 h-[40px] line-height-[40px] order-2"
         />
         <NumberInput
-          label="Withdraw"
+          label="Withdraw%"
           maxPrecision={100}
           name="Amount"
           value={withdrawFee + ""}
