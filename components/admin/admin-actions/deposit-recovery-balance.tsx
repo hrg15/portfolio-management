@@ -22,7 +22,7 @@ const DepositRecoveryBalance = () => {
         ethers.parseEther(depositAmount),
       );
       setIsOpen(false);
-      console.log(depositAmount);
+      // console.log(depositAmount);
     } catch (error) {
       console.log("error:" + error);
     }

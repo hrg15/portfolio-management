@@ -65,9 +65,9 @@ const WithdrawWholeFoundEth = () => {
 
   useEffect(() => {
     if (data?.pairs) {
-      setPairTokens(filterTokenPairs(data.pairs));
+      setPairTokens(filterTokenPairs(data.pairs, tokens));
     }
-  }, [data?.pairs]);
+  }, [data?.pairs, tokens]);
 
   const handleUserWithdrawEth = async () => {
     const version = tokens.map((t) => "3");

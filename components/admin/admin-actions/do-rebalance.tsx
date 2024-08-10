@@ -49,9 +49,9 @@ const DoRebalance = () => {
 
   useEffect(() => {
     if (data?.pairs) {
-      setPairTokens(filterTokenPairs(data.pairs));
+      setPairTokens(filterTokenPairs(data.pairs, tokens));
     }
-  }, [data?.pairs]);
+  }, [data?.pairs, tokens]);
 
   const handleRebalance = async () => {
     const version = tokens.map((t) => "3");

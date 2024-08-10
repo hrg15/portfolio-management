@@ -33,7 +33,6 @@ const Deposit = () => {
       setIsLoadingTokens(true);
       if (contract) {
         const result = await tokensList();
-        console.log("token ", result);
         const tokenAddresses = [];
         for (let i = 0; i < result.length; i++) {
           tokenAddresses.push(result[i]);
@@ -58,9 +57,9 @@ const Deposit = () => {
 
   useEffect(() => {
     if (data?.pairs) {
-      setPairTokens(filterTokenPairs(data.pairs));
+      setPairTokens(filterTokenPairs(data.pairs, tokens));
     }
-  }, [data?.pairs]);
+  }, [data?.pairs, tokens]);
 
   const handleDeposit = async () => {
     const version = tokens.map((t) => "3");
@@ -75,7 +74,7 @@ const Deposit = () => {
 
     try {
       const result = await deposit(amountInWei, encodedData);
-      console.log(amountInWei, encodedData);
+      // console.log(amountInWei, encodedData);
     } catch (error) {
       console.log("Error: " + error);
     }

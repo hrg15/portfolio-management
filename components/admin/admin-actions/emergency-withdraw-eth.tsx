@@ -8,13 +8,14 @@ import { IPairs } from "@/lib/endpoints/schemas";
 import { tokensHooks } from "@/lib/endpoints/tokens-endpoints";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
-import { filterTokenPairs } from "@/lib/utils";
+import { filterTokenPairs, filterUSDCTokenPairs } from "@/lib/utils";
 import { AbiCoder, ethers } from "ethers";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const EmergencyWithdrawToETH = () => {
-  const [pairTokens, setPairTokens] = useState<any[]>([]);
+  const [pairTokens, setPairTokens] = useState<string[]>([]);
+  const [usdcPairTokens, setUsdcPairTokens] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoadingTokens, setIsLoadingTokens] = useState(false);
   const [tokens, setTokens] = useState<any[]>([]);
@@ -48,6 +49,17 @@ const EmergencyWithdrawToETH = () => {
       enabled: isOpen,
     },
   );
+  const { data: usdcPairs, isLoading: usdcPairsLoading } =
+    tokensHooks.useQueryPairTokens(
+      {
+        params: {
+          token: USDC_T0KEN,
+        },
+      },
+      {
+        enabled: isOpen,
+      },
+    );
 
   useEffect(() => {
     if (data?.pairs) {
@@ -55,22 +67,32 @@ const EmergencyWithdrawToETH = () => {
     }
   }, [data?.pairs, tokens]);
 
+  useEffect(() => {
+    if (usdcPairs?.pairs) {
+      setUsdcPairTokens(filterUSDCTokenPairs(usdcPairs.pairs));
+      // setPairTokens((prv) => [
+      //   ...prv,
+      //   filterUSDCTokenPairs(usdcPairs?.pairs || []).join(","),
+      // ]);
+    }
+  }, [usdcPairs?.pairs, tokens]);
+
   const handleWithdraw = async () => {
-    const version = tokens.map((t) => "3");
+    const version = pairTokens.map((t) => "3");
 
     const abiCoder = new AbiCoder();
     const encodedData = abiCoder.encode(
-      ["address[]", "string[]", "string"],
-      [pairTokens, version, USDC_T0KEN],
+      ["address[]", "string[]"],
+      [pairTokens, version],
     );
-    console.log([pairTokens, version, USDC_T0KEN]);
+    console.log([pairTokens, version]);
 
-    // try {
-    //   const result = await adminWithdrawWholeFundWETH(encodedData);
-    //   setIsOpen(false);
-    // } catch (error) {
-    //   console.log("error:" + error);
-    // }
+    try {
+      const result = await adminWithdrawWholeFundWETH(encodedData);
+      setIsOpen(false);
+    } catch (error) {
+      console.log("error:" + error);
+    }
   };
 
   return (
@@ -105,10 +127,10 @@ const EmergencyWithdrawToETH = () => {
             Cancel
           </Button>
           <Button
-            disabled={isLoading || isLoadingTokens}
+            disabled={isLoading || isLoadingTokens || usdcPairsLoading}
             onClick={handleWithdraw}
           >
-            {isLoading || isLoadingTokens ? (
+            {isLoading || isLoadingTokens || usdcPairsLoading ? (
               <Spinner variant="secondary" />
             ) : (
               "Confirm"
@@ -121,3 +143,8 @@ const EmergencyWithdrawToETH = () => {
 };
 
 export default EmergencyWithdrawToETH;
+
+// [
+//   ["pair address", "usdc pair"],
+//   ["3", "3", "3"],
+// ]
