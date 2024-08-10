@@ -33,6 +33,7 @@ const Deposit = () => {
       setIsLoadingTokens(true);
       if (contract) {
         const result = await tokensList();
+        console.log("token ", result);
         const tokenAddresses = [];
         for (let i = 0; i < result.length; i++) {
           tokenAddresses.push(result[i]);
@@ -66,8 +67,8 @@ const Deposit = () => {
 
     const abiCoder = new AbiCoder();
     const encodedData = abiCoder.encode(
-      ["address[]", "address[]", "string[]"],
-      [pairTokens, tokens, version],
+      ["address[]", "string[]"],
+      [pairTokens, version],
     );
 
     const amountInWei = ethers.parseUnits(depositAmount, 18);

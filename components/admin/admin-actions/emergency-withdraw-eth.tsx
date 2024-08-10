@@ -3,7 +3,7 @@
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import Spinner from "@/components/spinner";
 import { Button } from "@/components/ui/button";
-import { CHAIN_ID, QUOTE_T0KEN } from "@/config";
+import { CHAIN_ID, QUOTE_T0KEN, USDC_T0KEN } from "@/config";
 import { IPairs } from "@/lib/endpoints/schemas";
 import { tokensHooks } from "@/lib/endpoints/tokens-endpoints";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const EmergencyWithdrawToETH = () => {
-  const [pairTokens, setPairTokens] = useState<string[]>([]);
+  const [pairTokens, setPairTokens] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoadingTokens, setIsLoadingTokens] = useState(false);
   const [tokens, setTokens] = useState<any[]>([]);
@@ -51,26 +51,26 @@ const EmergencyWithdrawToETH = () => {
 
   useEffect(() => {
     if (data?.pairs) {
-      setPairTokens(filterTokenPairs(data.pairs));
+      setPairTokens(filterTokenPairs(data.pairs, tokens));
     }
-  }, [data?.pairs]);
+  }, [data?.pairs, tokens]);
 
   const handleWithdraw = async () => {
-    const bytes = { pairAddress: pairTokens, tokens, version: 3 };
     const version = tokens.map((t) => "3");
 
     const abiCoder = new AbiCoder();
     const encodedData = abiCoder.encode(
-      ["address[]", "address[]", "string[]"],
-      [pairTokens, tokens, version],
+      ["address[]", "string[]", "string"],
+      [pairTokens, version, USDC_T0KEN],
     );
+    console.log([pairTokens, version, USDC_T0KEN]);
 
-    try {
-      const result = await adminWithdrawWholeFundWETH(encodedData);
-      setIsOpen(false);
-    } catch (error) {
-      console.log("error:" + error);
-    }
+    // try {
+    //   const result = await adminWithdrawWholeFundWETH(encodedData);
+    //   setIsOpen(false);
+    // } catch (error) {
+    //   console.log("error:" + error);
+    // }
   };
 
   return (
