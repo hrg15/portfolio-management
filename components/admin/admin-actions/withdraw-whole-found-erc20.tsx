@@ -30,7 +30,7 @@ const EmergencyWithdrawErc20 = () => {
           }}
           variant="outline"
         >
-          Withdraw whole found ERC20
+          Withdraw whole fund ERC20
         </Button>
       }
     >
