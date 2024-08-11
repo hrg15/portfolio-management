@@ -63,18 +63,11 @@ export const usePortfolioEndpoints = () => {
     async (ethAmount: any, bytes: any, currentGas: any) => {
       if (!(await ensureConnection())) return false;
 
-      const payload = {
-        value: ethAmount,
-        from: account,
-        to: CONTRACT_ADDRESS,
-        data: {},
-      };
-
       try {
         const deposit = await contract?.deposit(ethAmount, bytes, {
           value: ethAmount,
           // gasLimit: 300000,
-          gasPrice: currentGas,
+          // gasPrice: currentGas,
         });
         return deposit;
       } catch (error) {

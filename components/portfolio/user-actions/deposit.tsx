@@ -100,15 +100,12 @@ const Deposit = () => {
     );
 
     const amountInWei = ethers.parseEther(depositAmount);
-
     try {
       const result = await deposit(amountInWei, encodedData, gasPrice?.value);
     } catch (error) {
       console.log("Error: " + error);
     }
   };
-
-  console.log("gasPrice", gasPrice);
 
   return (
     <ResponsiveDialog

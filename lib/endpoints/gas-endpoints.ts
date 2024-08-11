@@ -25,7 +25,7 @@ const gasApi = makeApi([
         type: "Body",
         schema: z.object({
           key: z.literal("GASPRICE"),
-          value: z.string(),
+          value: z.any(),
         }),
       },
     ],

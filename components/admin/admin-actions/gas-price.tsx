@@ -13,10 +13,11 @@ const GasPrice = () => {
   const setGasPriceMutation = gasHooks.useSetGasPriceMutation();
 
   const handleSetGasPrice = async () => {
-    const gas = ethers.formatUnits(gasPrice, "gwei");
+    const gas = ethers.parseUnits(gasPrice, "gwei");
+    console.log(gas);
     setGasPriceMutation.mutate({
       key: "GASPRICE",
-      value: gas,
+      value: gas.toString(),
     });
   };
 
