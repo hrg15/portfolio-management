@@ -2,19 +2,15 @@ import { toast } from "sonner";
 
 const handleErrors = (errorString: string) => {
   if (errorString.includes("Lack of deposit amount")) {
-    toast.error(
-      "Lack of deposit amount: Please ensure you are sending enough funds.",
-    );
+    toast.error("Lack of deposit amount.");
     return;
   } else if (errorString.includes("Panic due to DIVIDE_BY_ZERO")) {
-    toast.error(
-      "Operation failed due to division by zero. Please check the values you are using.",
-    );
+    toast.error("Operation failed due to division by zero.");
     return;
   } else if (
     errorString.includes("UniswapV2Library: INSUFFICIENT_INPUT_AMOUNT")
   ) {
-    toast.error("Insufficient input amount: Please provide a higher amount.");
+    toast.error("Insufficient input amount.");
     return;
   } else if (errorString.includes("No ETH to withdraw")) {
     toast.error(
@@ -22,9 +18,10 @@ const handleErrors = (errorString: string) => {
     );
     return;
   } else if (errorString.includes("unknown custom error")) {
-    toast.error(
-      "An unknown custom error occurred: Please check the contract or transaction data.",
-    );
+    toast.error("An unknown custom error occurred.");
+    return;
+  } else if (errorString.includes("user rejected action")) {
+    toast.error("The event rejected by user.");
     return;
   } else {
     toast.error("An unknown error occurred. Please try again.");

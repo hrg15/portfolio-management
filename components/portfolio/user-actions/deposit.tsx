@@ -87,6 +87,9 @@ const Deposit = () => {
   }, [usdcPairs?.pairs, tokens]);
 
   const handleDeposit = async () => {
+    if (isLoading || usdcPairsLoading || isGasLoading) {
+      return;
+    }
     const pairAddress = [...pairTokens, usdcPairTokens[0]];
     const version = pairAddress.map((t) => "3");
 
@@ -99,8 +102,7 @@ const Deposit = () => {
     const amountInWei = ethers.parseEther(depositAmount);
 
     try {
-      const result = await deposit(amountInWei, encodedData);
-      // console.log(amountInWei, encodedData);
+      const result = await deposit(amountInWei, encodedData, gasPrice?.value);
     } catch (error) {
       console.log("Error: " + error);
     }

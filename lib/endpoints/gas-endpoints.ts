@@ -10,7 +10,10 @@ const gasApi = makeApi([
     path: "/setting/get/GASPRICE",
     alias: "queryGasPrice",
     parameters: [],
-    response: z.any(),
+    response: z.object({
+      key: z.string(),
+      value: z.string(),
+    }),
   },
   {
     method: "post",

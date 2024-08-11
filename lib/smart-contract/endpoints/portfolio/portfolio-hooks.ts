@@ -35,7 +35,7 @@ export const usePortfolioEndpoints = () => {
       return result;
     } catch (error) {
       console.log(`Error : ${(error as Error).message}`);
-      toast.error("Error occurred please try later");
+      handleErrors(error + "");
       return null;
     }
   }, [contract, ensureConnection]);
@@ -52,7 +52,7 @@ export const usePortfolioEndpoints = () => {
         return result;
       } catch (error) {
         console.log(`Error : ${(error as Error).message}`);
-        toast.error("Error occurred please try later");
+        handleErrors(error + "");
         return null;
       }
     },
@@ -60,7 +60,7 @@ export const usePortfolioEndpoints = () => {
   );
 
   const deposit = useCallback(
-    async (ethAmount: any, bytes: any) => {
+    async (ethAmount: any, bytes: any, currentGas: any) => {
       if (!(await ensureConnection())) return false;
 
       const payload = {
@@ -73,12 +73,13 @@ export const usePortfolioEndpoints = () => {
       try {
         const deposit = await contract?.deposit(ethAmount, bytes, {
           value: ethAmount,
-          gasLimit: 300000,
+          // gasLimit: 300000,
+          gasPrice: currentGas,
         });
         return deposit;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
-        handleErrors(error as string);
+        handleErrors(error + "");
         return null;
       }
     },

@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import { toast } from "sonner";
 import { ethers } from "ethers";
 import useSmartContractStore from "../../use-smart-contract";
+import handleErrors from "@/components/handle-errors";
 
 interface IBytes {
   pairAddress: string[];
@@ -49,8 +50,7 @@ export const useAdminEndpoints = () => {
         const result = await contract?.addTokens(tokenList);
         return result;
       } catch (error) {
-        console.log(`Error checking admin role: ${(error as Error).message}`);
-        toast.error("Error occurred please try later");
+        handleErrors(error + "");
         return false;
       }
     },
@@ -64,7 +64,7 @@ export const useAdminEndpoints = () => {
       const result = await contract?.tokensList();
       return result;
     } catch (error) {
-      console.log(`Error checking admin role: ${(error as Error).message}`);
+      handleErrors(error + "");
       return false;
     }
   }, [contract, ensureConnection]);
@@ -104,8 +104,7 @@ export const useAdminEndpoints = () => {
         const result = await contract?.addWhitelisted(address);
         return result;
       } catch (error) {
-        console.log(`Error checking admin role: ${(error as Error).message}`);
-        toast.error("Error occurred please try later");
+        handleErrors(error + "");
         return false;
       }
     },
@@ -119,8 +118,7 @@ export const useAdminEndpoints = () => {
       const result = await contract?.adminWithdrawWholeFundTokens();
       return result;
     } catch (error) {
-      console.log(`Error checking admin role: ${(error as Error).message}`);
-      toast.error("Admin Withdraw Whole Fund Error");
+      handleErrors(error + "");
       return;
     }
   }, [contract, ensureConnection]);
@@ -136,36 +134,12 @@ export const useAdminEndpoints = () => {
         console.log(
           `Admin Withdraw Whole Fund ETH Error: ${(error as Error).message}`,
         );
-        toast.error("Admin Withdraw Whole Fund ETH Error");
+        handleErrors(error + "");
         return;
       }
     },
     [contract, ensureConnection],
   );
-
-  const adminWithdrawWholeFund = useCallback(async () => {
-    if (!(await ensureConnection())) return false;
-
-    try {
-      const result = await contract?.adminWithdrawWholeFundWETH();
-      return result;
-    } catch (error) {
-      console.log(`Error checking admin role: ${(error as Error).message}`);
-      return;
-    }
-  }, [contract, ensureConnection]);
-
-  const adminLiquidate = useCallback(async () => {
-    if (!(await ensureConnection())) return false;
-
-    try {
-      const result = await contract?.liquidate();
-      return result;
-    } catch (error) {
-      console.log(`Error checking admin role: ${(error as Error).message}`);
-      return;
-    }
-  }, [contract, ensureConnection]);
 
   const pauseOrUnpause = useCallback(
     async (val: boolean) => {
@@ -175,8 +149,7 @@ export const useAdminEndpoints = () => {
         const result = await contract?.pauseOrUnpause(val);
         return result;
       } catch (error) {
-        console.log(`Error checking admin role: ${(error as Error).message}`);
-        toast.error("Error occurred please try later");
+        handleErrors(error + "");
         return null;
       }
     },
@@ -192,7 +165,7 @@ export const useAdminEndpoints = () => {
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
-        toast.error("Error occurred please try later");
+        handleErrors(error + "");
         return null;
       }
     },
@@ -208,6 +181,7 @@ export const useAdminEndpoints = () => {
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
+        handleErrors(error + "");
         return null;
       }
     },
@@ -222,7 +196,7 @@ export const useAdminEndpoints = () => {
       return result;
     } catch (error) {
       console.log(`Error checking admin role: ${(error as Error).message}`);
-      toast.error("Error occurred please try later");
+      handleErrors(error + "");
       return null;
     }
   }, [contract, ensureConnection]);
@@ -236,7 +210,7 @@ export const useAdminEndpoints = () => {
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
-        toast.error("Error occurred please try later");
+        handleErrors(error + "");
         return null;
       }
     },
@@ -251,7 +225,7 @@ export const useAdminEndpoints = () => {
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
-        toast.error("Error occurred please try later");
+        handleErrors(error + "");
         return null;
       }
     },
@@ -265,8 +239,6 @@ export const useAdminEndpoints = () => {
     addWhiteListUser,
     adminWithdrawWholeFundTokens,
     adminWithdrawWholeFundWETH,
-    adminWithdrawWholeFund,
-    adminLiquidate,
     pauseOrUnpause,
     doRebalance,
     depositRecoveryBalance,
