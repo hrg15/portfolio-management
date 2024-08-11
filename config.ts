@@ -1,6 +1,8 @@
 export const BASE_API_URL = (process.env.BASE_API_URL || "") + "/api";
 export const LOGIN_URL = process.env.LOGIN_URL;
 export const DEX_SCREENER = "https://api.dexscreener.com/latest/dex";
+export const CONTRACT_ADDRESS = "0x671B8D64C06bEA8c9aB0cAB307bbAf464593A251";
+
 
 export const CHAIN_ID = "polygon";
 export const QUOTE_T0KEN = "WMATIC";

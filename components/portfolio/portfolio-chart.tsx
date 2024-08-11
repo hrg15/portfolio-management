@@ -20,6 +20,9 @@ import {
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import { usePortfolioEndpoints } from "@/lib/smart-contract/endpoints/portfolio/portfolio-hooks";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
+import { ethers } from "ethers";
+import contractERC20ABI from "@/lib/smart-contract/ERC20_ABI.json";
+import { CONTRACT_ADDRESS } from "@/config";
 
 const chartData = [
   { browser: "btc", amount: 50, fill: "#E88C30" },
@@ -54,11 +57,12 @@ const chartConfig = {
 
 const PortfolioChart = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [tokens, setTokens] = useState<any[]>([]);
+  const [tokens, setTokens] = useState<string[]>([]);
 
-  const { contract, isWalletConnected, contractERC20 } =
+  const { contract, isWalletConnected, contractERC20, provider } =
     useSmartContractStore();
-  const { tokensList, balanceOfToken } = useAdminEndpoints();
+
+  const { tokensList } = useAdminEndpoints();
 
   useEffect(() => {
     const getTokens = async () => {
@@ -77,20 +81,49 @@ const PortfolioChart = () => {
     getTokens();
   }, [isWalletConnected]);
 
-  useEffect(() => {
-    const getBalance = async () => {
-      if (contractERC20) {
-        tokens.map(async (token) => {
-          const balance = await balanceOfToken(token);
-          // console.log("balance", token); // replace with your own balance calculation logic
-        });
-      }
-    };
+  const getTokenBalance = async (
+    provider: any,
+    tokenAddress: string,
+    abi: any,
+  ) => {
+    const contract = new ethers.Contract(tokenAddress, abi, provider);
+    const balance = await contract.balanceOf(CONTRACT_ADDRESS);
+    return balance;
+  };
 
-    if (tokens.length > 0) {
-      getBalance();
+  const getAllTokenBalances = async (
+    provider: any,
+    tokenAddresses: string[],
+    abi: any,
+  ) => {
+    const balances: { [key: string]: string | {} } = {};
+
+    for (const tokenAddress of tokenAddresses) {
+      balances[tokenAddress] = {};
+      const balance = await getTokenBalance(provider, tokenAddress, abi);
+      balances[tokenAddress] = balance.toString();
     }
-  }, [tokens, isWalletConnected]);
+
+    return balances;
+  };
+
+  const [balances, setBalances] = useState({});
+
+  useEffect(() => {
+    async function fetchBalances() {
+      const result = await getAllTokenBalances(
+        provider,
+        tokens,
+        contractERC20ABI,
+      );
+      setBalances(result);
+    }
+    if (tokens.length > 0) {
+      fetchBalances();
+    }
+  }, [tokens]);
+
+  // console.log("balances: ", balances);
 
   return (
     <div>

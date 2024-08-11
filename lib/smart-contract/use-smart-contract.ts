@@ -4,10 +4,9 @@ import contractABI from "@/lib/smart-contract/ABI.json";
 import contractERC20ABI from "@/lib/smart-contract/ERC20_ABI.json";
 import USDT_ABI from "@/lib/smart-contract/USDT_ABI.json";
 import { toast } from "sonner";
+import { CONTRACT_ADDRESS } from "@/config";
 
-const contractAddress = "0x671B8D64C06bEA8c9aB0cAB307bbAf464593A251";
-
-const usdtContractAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // Ethereum Mainnet USDT address
+// const usdtContractAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // Ethereum Mainnet USDT address
 
 interface BlockchainState {
   provider: ethers.BrowserProvider | null;
@@ -86,12 +85,12 @@ const useSmartContractStore = create<BlockchainState>((set, get) => ({
         const signer = await provider.getSigner();
         const address = await signer.getAddress();
         const contractInstance = new ethers.Contract(
-          contractAddress,
+          CONTRACT_ADDRESS,
           contractABI.abi,
           signer,
         );
         const contractERC20Instance = new ethers.Contract(
-          contractAddress,
+          CONTRACT_ADDRESS,
           contractERC20ABI,
           signer,
         );
