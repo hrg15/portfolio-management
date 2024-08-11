@@ -66,7 +66,7 @@ export const usePortfolioEndpoints = () => {
       try {
         const deposit = await contract?.deposit(ethAmount, bytes, {
           value: ethAmount,
-          gasLimit: 300000,
+          gasLimit: 3000000,
           // gasPrice: currentGas,
         });
         return deposit;
