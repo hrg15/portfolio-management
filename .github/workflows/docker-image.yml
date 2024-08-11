@@ -1,0 +1,29 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: frontend
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: build and deploy
+      run: |
+        docker build . --file Dockerfile --tag portfoliomanager-frontend:latest
+        cd /home/ubuntu/frontend && docker compose up -d
+      shell: bash
+    # - name: Build the Docker image
+    #   run: docker build . --file Dockerfile --tag portfoliomanager-frontend:latest
+    # # - name: SSH Command
+    # #   uses: Flaavius/ssh-commands@1.0
+    # #   with:
+    # #     host: ${{ secrets.HOST }}
+    # #     username: ${{ secrets.USER }}
+    # #     password: ${{ secrets.PASSWORD }}      
+    # #     command: cd changefa-micros && echo ${{ secrets.REGISTRY_PASS }}  | docker login --username root --password-stdin ${{ vars.REGISTRY_URL }}  && docker compose pull && docker compose up -d
+    # - name: deploy
+    #   run: cd /home/ubuntu/frontend && docker compose --env-file .env up -d 
