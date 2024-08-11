@@ -4,6 +4,7 @@ import { ethers, Transaction } from "ethers";
 import useSmartContractStore from "../../use-smart-contract";
 import { number } from "zod";
 import { CONTRACT_ADDRESS } from "@/config";
+import handleErrors from "@/components/handle-errors";
 interface IBytes {
   pairAddress: string[];
   tokens: string[];
@@ -77,7 +78,7 @@ export const usePortfolioEndpoints = () => {
         return deposit;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
-        toast.error("Error occurred please try later");
+        handleErrors(error as string);
         return null;
       }
     },

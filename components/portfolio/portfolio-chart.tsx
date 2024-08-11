@@ -130,7 +130,7 @@ const PortfolioChart = () => {
     }
   }, [tokens]);
 
-  console.log("balances: ", balances);
+  // console.log("balances: ", balances);
 
   return (
     <div>

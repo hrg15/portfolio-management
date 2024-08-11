@@ -1,12 +1,9 @@
-export const BASE_API_URL = (process.env.BASE_API_URL || "") + "/api";
-export const LOGIN_URL = process.env.LOGIN_URL;
-export const DEX_SCREENER = "https://api.dexscreener.com/latest/dex";
-export const CONTRACT_ADDRESS = "0x671B8D64C06bEA8c9aB0cAB307bbAf464593A251";
-
+export const DEX_SCREENER = process.env.DEX_SCREENER;
+export const GASPRICE_URL = process.env.GASPRICE_URL;
+export const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS;
 
 export const CHAIN_ID = "polygon";
 export const QUOTE_T0KEN = "WMATIC";
-export const USDC_T0KEN = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174";
+export const USDC_T0KEN_PAIR = process.env.USDC_T0KEN_PAIR;
 
-export const CODE_BYTES =
-  "0xf23ec0bb4210edd5cba85afd05127efcd2fc6a781bfed49188da1081670b22d8";
+export const CODE_BYTES = process.env.CODE_BYTES;

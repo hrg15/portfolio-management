@@ -6,7 +6,8 @@ import QuickPercentSlider from "@/components/quick-percent-slider";
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import Spinner from "@/components/spinner";
 import { Button } from "@/components/ui/button";
-import { CHAIN_ID, QUOTE_T0KEN } from "@/config";
+import { CHAIN_ID, QUOTE_T0KEN, USDC_T0KEN_PAIR } from "@/config";
+import { gasHooks } from "@/lib/endpoints/gas-endpoints";
 import { IPairs } from "@/lib/endpoints/schemas";
 import { tokensHooks } from "@/lib/endpoints/tokens-endpoints";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
@@ -59,13 +60,19 @@ const Deposit = () => {
     tokensHooks.useQueryPairTokens(
       {
         params: {
-          token: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+          token: USDC_T0KEN_PAIR,
         },
       },
       {
         enabled: isOpen && tokens.length > 0,
       },
     );
+  const { data: gasPrice, isLoading: isGasLoading } = gasHooks.useQueryGasPrice(
+    undefined,
+    {
+      enabled: isOpen,
+    },
+  );
 
   useEffect(() => {
     if (data?.pairs) {
@@ -98,6 +105,8 @@ const Deposit = () => {
       console.log("Error: " + error);
     }
   };
+
+  console.log("gasPrice", gasPrice);
 
   return (
     <ResponsiveDialog

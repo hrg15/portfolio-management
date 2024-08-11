@@ -1,7 +1,7 @@
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import Spinner from "@/components/spinner";
 import { Button } from "@/components/ui/button";
-import { CHAIN_ID, QUOTE_T0KEN } from "@/config";
+import { CHAIN_ID, QUOTE_T0KEN, USDC_T0KEN_PAIR } from "@/config";
 import { IPairs } from "@/lib/endpoints/schemas";
 import { tokensHooks } from "@/lib/endpoints/tokens-endpoints";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
@@ -51,7 +51,7 @@ const DoRebalance = () => {
     tokensHooks.useQueryPairTokens(
       {
         params: {
-          token: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+          token: USDC_T0KEN_PAIR,
         },
       },
       {
