@@ -50,6 +50,7 @@ export const useAdminEndpoints = () => {
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
+        toast.error("Error occurred please try later");
         return false;
       }
     },
@@ -104,6 +105,7 @@ export const useAdminEndpoints = () => {
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
+        toast.error("Error occurred please try later");
         return false;
       }
     },
@@ -118,6 +120,7 @@ export const useAdminEndpoints = () => {
       return result;
     } catch (error) {
       console.log(`Error checking admin role: ${(error as Error).message}`);
+      toast.error("Admin Withdraw Whole Fund Error");
       return;
     }
   }, [contract, ensureConnection]);
@@ -173,6 +176,7 @@ export const useAdminEndpoints = () => {
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
+        toast.error("Error occurred please try later");
         return null;
       }
     },
@@ -188,6 +192,7 @@ export const useAdminEndpoints = () => {
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
+        toast.error("Error occurred please try later");
         return null;
       }
     },
@@ -246,6 +251,7 @@ export const useAdminEndpoints = () => {
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
+        toast.error("Error occurred please try later");
         return null;
       }
     },

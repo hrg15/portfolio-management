@@ -1,15 +1,16 @@
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { ethers } from "ethers";
+import { ethers, Transaction } from "ethers";
 import useSmartContractStore from "../../use-smart-contract";
 import { number } from "zod";
+import { CONTRACT_ADDRESS } from "@/config";
 interface IBytes {
   pairAddress: string[];
   tokens: string[];
   version: string | number;
 }
 export const usePortfolioEndpoints = () => {
-  const { contract, isWalletConnected, connectWallet } =
+  const { contract, isWalletConnected, connectWallet, account, signer } =
     useSmartContractStore();
 
   const ensureConnection = useCallback(async () => {
@@ -33,18 +34,7 @@ export const usePortfolioEndpoints = () => {
       return result;
     } catch (error) {
       console.log(`Error : ${(error as Error).message}`);
-      return null;
-    }
-  }, [contract, ensureConnection]);
-
-  const portfolioList = useCallback(async () => {
-    if (!(await ensureConnection())) return false;
-
-    try {
-      const result = await contract?.portfolioList();
-      return result;
-    } catch (error) {
-      console.log(`Error checking admin role: ${(error as Error).message}`);
+      toast.error("Error occurred please try later");
       return null;
     }
   }, [contract, ensureConnection]);
@@ -61,6 +51,7 @@ export const usePortfolioEndpoints = () => {
         return result;
       } catch (error) {
         console.log(`Error : ${(error as Error).message}`);
+        toast.error("Error occurred please try later");
         return null;
       }
     },
@@ -71,11 +62,22 @@ export const usePortfolioEndpoints = () => {
     async (ethAmount: any, bytes: any) => {
       if (!(await ensureConnection())) return false;
 
+      const payload = {
+        value: ethAmount,
+        from: account,
+        to: CONTRACT_ADDRESS,
+        data: {},
+      };
+
       try {
-        const result = await contract?.deposit(ethAmount, bytes);
-        return result;
+        const deposit = await contract?.deposit(ethAmount, bytes, {
+          value: ethAmount,
+          gasLimit: 300000,
+        });
+        return deposit;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
+        toast.error("Error occurred please try later");
         return null;
       }
     },
@@ -85,7 +87,6 @@ export const usePortfolioEndpoints = () => {
   return {
     withdrawAllInKind,
     deposit,
-    portfolioList,
     userWithdrawWholeFundWETH,
   };
 };

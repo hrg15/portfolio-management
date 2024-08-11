@@ -86,9 +86,16 @@ const PortfolioChart = () => {
     tokenAddress: string,
     abi: any,
   ) => {
-    const contract = new ethers.Contract(tokenAddress, abi, provider);
-    const balance = await contract.balanceOf(CONTRACT_ADDRESS);
-    return balance;
+    if (!isWalletConnected) {
+      return;
+    }
+    try {
+      const contract = new ethers.Contract(tokenAddress, abi, provider);
+      const balance = await contract?.balanceOf(CONTRACT_ADDRESS);
+      return balance;
+    } catch (error) {
+      console.log("Error", error);
+    }
   };
 
   const getAllTokenBalances = async (
@@ -96,19 +103,19 @@ const PortfolioChart = () => {
     tokenAddresses: string[],
     abi: any,
   ) => {
+    if (!isWalletConnected) return;
     const balances: { [key: string]: string | {} } = {};
 
     for (const tokenAddress of tokenAddresses) {
       balances[tokenAddress] = {};
       const balance = await getTokenBalance(provider, tokenAddress, abi);
-      balances[tokenAddress] = balance.toString();
+      balances[tokenAddress] = balance?.toString();
     }
 
     return balances;
   };
 
   const [balances, setBalances] = useState({});
-
   useEffect(() => {
     async function fetchBalances() {
       const result = await getAllTokenBalances(
@@ -116,14 +123,14 @@ const PortfolioChart = () => {
         tokens,
         contractERC20ABI,
       );
-      setBalances(result);
+      setBalances(result || {});
     }
     if (tokens.length > 0) {
       fetchBalances();
     }
   }, [tokens]);
 
-  // console.log("balances: ", balances);
+  console.log("balances: ", balances);
 
   return (
     <div>

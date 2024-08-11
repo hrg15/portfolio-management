@@ -81,6 +81,8 @@ const DoRebalance = () => {
       [pairAddress, version],
     );
 
+    console.log([pairAddress, version]);
+
     try {
       const result = await doRebalance(encodedData);
       setIsOpen(false);

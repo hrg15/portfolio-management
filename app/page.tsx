@@ -25,7 +25,7 @@ export default function Home() {
           router.push(Routes.Portfolio);
         }
       } else {
-        await connectWallet();
+        router.push(Routes.Portfolio);
       }
     };
 

@@ -25,7 +25,7 @@ const Deposit = () => {
   const [depositAmount, setDepositAmount] = useState("0");
   const [usdcPairTokens, setUsdcPairTokens] = useState<string[]>([]);
 
-  const { contract, isWalletConnected } = useSmartContractStore();
+  const { contract, isWalletConnected, signer } = useSmartContractStore();
   const { deposit } = usePortfolioEndpoints();
   const { tokensList } = useAdminEndpoints();
 
@@ -52,7 +52,7 @@ const Deposit = () => {
       },
     },
     {
-      enabled: isOpen,
+      enabled: isOpen && tokens.length > 0,
     },
   );
   const { data: usdcPairs, isLoading: usdcPairsLoading } =
@@ -63,7 +63,7 @@ const Deposit = () => {
         },
       },
       {
-        enabled: isOpen,
+        enabled: isOpen && tokens.length > 0,
       },
     );
 
@@ -89,7 +89,7 @@ const Deposit = () => {
       [pairAddress, version],
     );
 
-    const amountInWei = ethers.parseUnits(depositAmount, 18);
+    const amountInWei = ethers.parseEther(depositAmount);
 
     try {
       const result = await deposit(amountInWei, encodedData);
