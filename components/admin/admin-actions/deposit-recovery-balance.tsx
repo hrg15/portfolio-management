@@ -18,9 +18,8 @@ const DepositRecoveryBalance = () => {
 
   const handleDeposit = async () => {
     try {
-      const result = await depositRecoveryBalance(
-        ethers.parseEther(depositAmount),
-      );
+      const amountInWei = ethers.parseEther(depositAmount);
+      const result = await depositRecoveryBalance(amountInWei);
       setIsOpen(false);
       // console.log(depositAmount);
     } catch (error) {

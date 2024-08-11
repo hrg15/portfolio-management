@@ -177,7 +177,10 @@ export const useAdminEndpoints = () => {
       if (!(await ensureConnection())) return false;
 
       try {
-        const result = await contract?.depositRecoveryBalance(value);
+        const result = await contract?.depositRecoveryBalance(value, {
+          value: value,
+          gasLimit: 3000000,
+        });
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
