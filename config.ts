@@ -1,6 +1,9 @@
-export const DEX_SCREENER = process.env.DEX_SCREENER || "";
-export const GASPRICE_URL = process.env.GASPRICE_URL || "";
-export const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS || "";
+export const DEX_SCREENER =
+  process.env.DEX_SCREENER || "https://api.dexscreener.com/latest/dex";
+export const GASPRICE_URL =
+  process.env.GASPRICE_URL || "http://75.119.158.28:3000";
+export const CONTRACT_ADDRESS =
+  process.env.CONTRACT_ADDRESS || "0x671B8D64C06bEA8c9aB0cAB307bbAf464593A251";
 
 export const CHAIN_ID = "polygon";
 export const QUOTE_T0KEN = "WMATIC";
