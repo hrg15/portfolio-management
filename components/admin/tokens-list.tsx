@@ -75,7 +75,7 @@ const TokensList = () => {
 
   // const isLoadingTokens = tokensDataIsLoading && tokens.length > 0;
 
-  function useUniqueBaseTokens(pairs: IPairs[]): IBaseToke[] {
+  function handleUniqueBaseTokens(pairs: IPairs[]): IBaseToke[] {
     const uniqueTokens: { [key: string]: IBaseToke } = {};
     pairs.forEach(({ baseToken }) => {
       const key = baseToken.address;
@@ -87,7 +87,7 @@ const TokensList = () => {
     return Object.values(uniqueTokens).map((uniqueTokens) => uniqueTokens);
   }
 
-  // console.log(useUniqueBaseTokens(data?.pairs || []));
+  // console.log(handleUniqueBaseTokens(data?.pairs || []));
   // const baseAddresses = data?.pairs?.map((pair) => pair.baseToken.address);
   // console.log(baseAddresses);
   // console.log(tokens);
@@ -135,7 +135,7 @@ const TokensList = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              useUniqueBaseTokens(data?.pairs || []).map((token, index) => {
+              handleUniqueBaseTokens(data?.pairs || []).map((token, index) => {
                 return (
                   <SingleTokenRow
                     key={token.address}
