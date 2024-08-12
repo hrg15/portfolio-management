@@ -161,7 +161,9 @@ export const useAdminEndpoints = () => {
       if (!(await ensureConnection())) return false;
 
       try {
-        const result = await contract?.doRebalance(bytes);
+        const result = await contract?.doRebalance(bytes, {
+          gasLimit: 3000000,
+        });
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
