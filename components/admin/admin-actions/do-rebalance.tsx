@@ -1,15 +1,15 @@
+"use client";
+
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import Spinner from "@/components/spinner";
 import { Button } from "@/components/ui/button";
-import { CHAIN_ID, QUOTE_T0KEN, USDC_T0KEN_PAIR } from "@/config";
-import { IPairs } from "@/lib/endpoints/schemas";
+import { USDC_T0KEN_PAIR } from "@/config";
 import { tokensHooks } from "@/lib/endpoints/tokens-endpoints";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import { filterTokenPairs, filterUSDCTokenPairs } from "@/lib/utils";
 import { AbiCoder } from "ethers";
 import { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 const DoRebalance = () => {
   const [pairTokens, setPairTokens] = useState<string[]>([]);

@@ -24,14 +24,18 @@ import { cn } from "@/lib/utils";
 import { AddIcon, DeleteIcon } from "../icons/icons";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
 import Spinner from "../spinner";
+import { ResponsiveDialog } from "../responsive-dialog";
 
 const TokensList = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [tokens, setTokens] = useState<any[]>([]);
+  const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
+  const [selectedToken, setSelectedToken] = useState<number[] | null>([]);
 
   const { contract, isWalletConnected } = useSmartContractStore();
   const { tokensList } = useAdminEndpoints();
+
   useEffect(() => {
     const getTokens = async () => {
       setIsLoading(true);
@@ -47,6 +51,11 @@ const TokensList = () => {
     };
     getTokens();
   }, [isWalletConnected]);
+
+  const handleOpenDialog = (tokenIndex: number) => {
+    setSelectedToken([tokenIndex]);
+    setIsRemoveDialogOpen(true);
+  };
 
   return (
     <>
@@ -78,6 +87,11 @@ const TokensList = () => {
               tokens.map((token, index) => (
                 <TableRow key={index}>
                   <TableCell className="font-medium">{token}</TableCell>
+                  <TableCell className="text-right">
+                    <button onClick={() => handleOpenDialog(index)}>
+                      <DeleteIcon className="size-6 hover:text-error" />
+                    </button>
+                  </TableCell>
                 </TableRow>
               ))
             )}
@@ -85,6 +99,11 @@ const TokensList = () => {
         </Table>
       </div>
       <AddTokenDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+      <RemoveTokenDialog
+        token={selectedToken || []}
+        isOpen={isRemoveDialogOpen}
+        setIsOpen={setIsRemoveDialogOpen}
+      />
     </>
   );
 };
@@ -161,5 +180,46 @@ const AddTokenDialog = ({
         </Button>
       </DialogContent>
     </Dialog>
+  );
+};
+
+const RemoveTokenDialog = ({
+  isOpen,
+  setIsOpen,
+  token,
+}: {
+  isOpen: boolean;
+  setIsOpen: (val: boolean) => void;
+  token: number[];
+}) => {
+  const { removeTokens } = useAdminEndpoints();
+
+  const handleDeleteToken = async () => {
+    try {
+      const result = await removeTokens(token);
+      setIsOpen(false);
+    } catch (error) {
+      console.log("Error remove Token", error);
+    }
+  };
+
+  return (
+    <ResponsiveDialog open={isOpen} setOpen={setIsOpen} title="Remove Token">
+      <div className="space-y-4">
+        <div className="text-center">Are sure to remove this token?</div>
+        <div className="flex w-full items-center justify-around">
+          <Button
+            onClick={() => {
+              setIsOpen(false);
+            }}
+            type="button"
+            variant="destructive"
+          >
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteToken}>Remove</Button>
+        </div>
+      </div>
+    </ResponsiveDialog>
   );
 };

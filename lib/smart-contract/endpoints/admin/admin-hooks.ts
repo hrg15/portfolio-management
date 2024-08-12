@@ -251,6 +251,21 @@ export const useAdminEndpoints = () => {
     },
     [contract, ensureConnection],
   );
+  const removeTokens = useCallback(
+    async (tokenIndex: number[]) => {
+      if (!(await ensureConnection())) return false;
+
+      try {
+        const result = await contract?.removeTokens(tokenIndex);
+        return result;
+      } catch (error) {
+        console.log(`Error checking admin role: ${(error as Error).message}`);
+        handleErrors(error + "");
+        return null;
+      }
+    },
+    [contract, ensureConnection],
+  );
 
   return {
     checkAdminRole,
@@ -268,5 +283,6 @@ export const useAdminEndpoints = () => {
     balanceOfToken,
     removeWhitelisted,
     updateSlippageTolerance,
+    removeTokens,
   };
 };

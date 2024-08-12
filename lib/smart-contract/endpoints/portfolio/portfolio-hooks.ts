@@ -67,9 +67,7 @@ export const usePortfolioEndpoints = () => {
         const deposit = await contract?.deposit(ethAmount, bytes, {
           value: ethAmount,
           gasLimit: 3000000,
-          // gasPrice: currentGas,
         });
-        // await deposit.wait();
         return deposit;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
