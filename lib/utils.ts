@@ -188,6 +188,13 @@ export function monthDate() {
   return dateRange;
 }
 
+export function shortenString(str: string, maxLength: number = 10) {
+  if (str.length <= maxLength) {
+    return str;
+  }
+  return str.slice(0, maxLength - 3) + "...";
+}
+
 export const filterTokenPairs = (pairs: IPairs[], tokenList: string[]) => {
   const filteredPairs = pairs.filter(
     (pair) =>
