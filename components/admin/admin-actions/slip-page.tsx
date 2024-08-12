@@ -40,7 +40,7 @@ const SlipPage = () => {
     <ResponsiveDialog
       open={isOpen}
       setOpen={setIsOpen}
-      title={"Slip page"}
+      title={"Slippage"}
       trigger={
         <Button
           size="sm"
@@ -49,7 +49,7 @@ const SlipPage = () => {
           }}
           variant="outline"
         >
-          Slip Page
+          Slippage
         </Button>
       }
     >
