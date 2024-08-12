@@ -48,6 +48,9 @@ export const usePortfolioEndpoints = () => {
         const result = await contract?.userWithdrawWholeFundWETH(
           bytes,
           percentage,
+          {
+            gasLimit: 3000000,
+          },
         );
         return result;
       } catch (error) {
