@@ -234,6 +234,21 @@ export const useAdminEndpoints = () => {
     },
     [contract, ensureConnection],
   );
+  const updateSlippageTolerance = useCallback(
+    async (percentage: number) => {
+      if (!(await ensureConnection())) return false;
+
+      try {
+        const result = await contract?.updateSlippageTolerance(percentage);
+        return result;
+      } catch (error) {
+        console.log(`Error checking admin role: ${(error as Error).message}`);
+        handleErrors(error + "");
+        return null;
+      }
+    },
+    [contract, ensureConnection],
+  );
 
   return {
     checkAdminRole,
@@ -250,5 +265,6 @@ export const useAdminEndpoints = () => {
     usersList,
     balanceOfToken,
     removeWhitelisted,
+    updateSlippageTolerance,
   };
 };

@@ -8,6 +8,7 @@ import DoRebalance from "./do-rebalance";
 import DepositRecoveryBalance from "./deposit-recovery-balance";
 import WithdrawAccumulatedFees from "./withdraw-accumulated-fees";
 import GasPrice from "./gas-price";
+import SlipPage from "./slip-page";
 
 const AdminActions = () => {
   return (
@@ -19,6 +20,7 @@ const AdminActions = () => {
         <DoRebalance />
         <DepositRecoveryBalance />
         <WithdrawAccumulatedFees />
+        <SlipPage />
         <GasPrice />
       </div>
       <SetFees />
