@@ -74,12 +74,9 @@ const DoRebalance = () => {
   const handleRebalance = async () => {
     const pairAddress = [...pairTokens, usdcPairTokens[0]];
     const version = pairAddress.map((t) => "3");
-
+    const types = ["address[]", "uint8[]"];
     const abiCoder = new AbiCoder();
-    const encodedData = abiCoder.encode(
-      ["address[]", "string[]"],
-      [pairAddress, version],
-    );
+    const encodedData = abiCoder.encode(types, [pairAddress, version]);
 
     console.log([pairAddress, version]);
 

@@ -45,7 +45,7 @@ const EmergencyWithdrawToETH = () => {
       },
     },
     {
-      enabled: isOpen,
+      enabled: isOpen && tokens.length > 0,
     },
   );
   const { data: usdcPairs, isLoading: usdcPairsLoading } =
@@ -75,12 +75,9 @@ const EmergencyWithdrawToETH = () => {
   const handleWithdraw = async () => {
     const pairAddress = [...pairTokens, usdcPairTokens[0]];
     const version = pairAddress.map((t) => "3");
-
+    const types = ["address[]", "uint8[]"];
     const abiCoder = new AbiCoder();
-    const encodedData = abiCoder.encode(
-      ["address[]", "string[]"],
-      [pairAddress, version],
-    );
+    const encodedData = abiCoder.encode(types, [pairAddress, version]);
 
     try {
       const result = await adminWithdrawWholeFundWETH(encodedData);
