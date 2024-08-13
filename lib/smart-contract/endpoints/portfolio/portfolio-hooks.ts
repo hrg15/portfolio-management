@@ -27,29 +27,50 @@ export const usePortfolioEndpoints = () => {
     return true;
   }, [isWalletConnected, contract, connectWallet]);
 
-  const withdrawAllInKind = useCallback(async () => {
-    if (!(await ensureConnection())) return false;
-
-    try {
-      const result = await contract?.withdrawAllInKind();
-      return result;
-    } catch (error) {
-      console.log(`Error : ${(error as Error).message}`);
-      handleErrors(error + "");
-      return null;
-    }
-  }, [contract, ensureConnection]);
-
-  const userWithdrawWholeFundWETH = useCallback(
-    async (bytes: any, percentage: number) => {
+  const withdrawAllInKind = useCallback(
+    async (tokenAmount: any) => {
       if (!(await ensureConnection())) return false;
 
       try {
-        const result = await contract?.userWithdrawWholeFundWETH(
-          bytes,
-          percentage,
-        );
-        return result;
+        const tx = await contract?.withdraw(tokenAmount, {
+          gasLimit: 3000000,
+        });
+        await tx.wait();
+      } catch (error) {
+        console.log(`Error : ${(error as Error).message}`);
+        handleErrors(error + "");
+        return null;
+      }
+    },
+    [contract, ensureConnection],
+  );
+
+  const userWithdrawWholeFundWETH = useCallback(
+    async (amount: any) => {
+      if (!(await ensureConnection())) return false;
+
+      try {
+        const tx = await contract?.withdrawToETH(amount, {
+          gasLimit: 3000000,
+        });
+        await tx.wait();
+      } catch (error) {
+        console.log(`Error : ${(error as Error).message}`);
+        handleErrors(error + "");
+        return null;
+      }
+    },
+    [contract, ensureConnection],
+  );
+  const balanceOf = useCallback(
+    async (address: string) => {
+      if (!(await ensureConnection())) return false;
+
+      try {
+        const tx = await contract?.balanceOf(address, {
+          gasLimit: 3000000,
+        });
+        return tx;
       } catch (error) {
         console.log(`Error : ${(error as Error).message}`);
         handleErrors(error + "");
@@ -60,16 +81,16 @@ export const usePortfolioEndpoints = () => {
   );
 
   const deposit = useCallback(
-    async (ethAmount: any, bytes: any, currentGas: any) => {
+    async (ethAmount: any) => {
       if (!(await ensureConnection())) return false;
 
       try {
-        const deposit = await contract?.deposit(ethAmount, bytes, {
+        const tx = await contract?.deposit({
           value: ethAmount,
-          // gasLimit: 300000,
-          // gasPrice: currentGas,
+          gasLimit: 3000000,
         });
-        return deposit;
+        await tx.wait();
+        toast.success("Deposit was successfully.");
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
         handleErrors(error + "");
@@ -83,5 +104,6 @@ export const usePortfolioEndpoints = () => {
     withdrawAllInKind,
     deposit,
     userWithdrawWholeFundWETH,
+    balanceOf,
   };
 };

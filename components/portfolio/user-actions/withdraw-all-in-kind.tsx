@@ -3,16 +3,36 @@
 import { ResponsiveDialog } from "@/components/responsive-dialog";
 import { Button } from "@/components/ui/button";
 import { usePortfolioEndpoints } from "@/lib/smart-contract/endpoints/portfolio/portfolio-hooks";
-import { useState } from "react";
+import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const WithdrawAllInKind = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { withdrawAllInKind } = usePortfolioEndpoints();
+  const [balance, setBalance] = useState(0);
+
+  const { contract, isWalletConnected, account } = useSmartContractStore();
+  const { withdrawAllInKind, balanceOf } = usePortfolioEndpoints();
+
+  useEffect(() => {
+    const getBalanceOfAccount = async () => {
+      try {
+        const result = await balanceOf(account || "");
+        console.log("balance", result);
+        setBalance(result);
+      } catch (error) {
+        console.log("Error: " + error);
+      }
+    };
+
+    if (account!! && isWalletConnected) {
+      getBalanceOfAccount();
+    }
+  }, [account, isWalletConnected]);
 
   const handleWithdraw = async () => {
     try {
-      const result = await withdrawAllInKind();
+      const result = await withdrawAllInKind(balance);
       setIsOpen(false);
     } catch (error) {
       console.log("error", error);

@@ -19,89 +19,18 @@ import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const Deposit = () => {
-  const [pairTokens, setPairTokens] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoadingTokens, setIsLoadingTokens] = useState(false);
-  const [tokens, setTokens] = useState<any[]>([]);
   const [depositAmount, setDepositAmount] = useState("0");
-  const [usdcPairTokens, setUsdcPairTokens] = useState<string[]>([]);
 
-  const { contract, isWalletConnected, signer } = useSmartContractStore();
-  const { deposit } = usePortfolioEndpoints();
-  const { tokensList } = useAdminEndpoints();
-
-  useEffect(() => {
-    const getTokens = async () => {
-      setIsLoadingTokens(true);
-      if (contract) {
-        const result = await tokensList();
-        const tokenAddresses = [];
-        for (let i = 0; i < result.length; i++) {
-          tokenAddresses.push(result[i]);
-        }
-        setTokens(tokenAddresses);
-      }
-      setIsLoadingTokens(false);
-    };
-    getTokens();
-  }, [isWalletConnected]);
-
-  const { data, isLoading } = tokensHooks.useQueryPairTokens(
-    {
-      params: {
-        token: tokens.join(","),
-      },
-    },
-    {
-      enabled: isOpen && tokens.length > 0,
-    },
-  );
-  const { data: usdcPairs, isLoading: usdcPairsLoading } =
-    tokensHooks.useQueryPairTokens(
-      {
-        params: {
-          token: USDC_T0KEN_PAIR,
-        },
-      },
-      {
-        enabled: isOpen && tokens.length > 0,
-      },
-    );
-  const { data: gasPrice, isLoading: isGasLoading } = gasHooks.useQueryGasPrice(
-    undefined,
-    {
-      enabled: isOpen,
-    },
-  );
-
-  useEffect(() => {
-    if (data?.pairs) {
-      setPairTokens(filterTokenPairs(data.pairs, tokens));
-    }
-  }, [data?.pairs, tokens]);
-
-  useEffect(() => {
-    if (usdcPairs?.pairs) {
-      setUsdcPairTokens(filterUSDCTokenPairs(usdcPairs.pairs));
-    }
-  }, [usdcPairs?.pairs, tokens]);
+  const { contract, isWalletConnected, signer, account } =
+    useSmartContractStore();
+  const { deposit, balanceOf } = usePortfolioEndpoints();
 
   const handleDeposit = async () => {
-    if (isLoading || usdcPairsLoading || isGasLoading) {
-      return;
-    }
-    const pairAddress = [...pairTokens, usdcPairTokens[0]];
-    const version = pairAddress.map((t) => "3");
-
-    const abiCoder = new AbiCoder();
-    const encodedData = abiCoder.encode(
-      ["address[]", "string[]"],
-      [pairAddress, version],
-    );
-
     const amountInWei = ethers.parseEther(depositAmount);
+    console.log(amountInWei);
     try {
-      const result = await deposit(amountInWei, encodedData, gasPrice?.value);
+      const result = await deposit(amountInWei);
     } catch (error) {
       console.log("Error: " + error);
     }
@@ -148,16 +77,7 @@ const Deposit = () => {
           >
             Cancel
           </Button>
-          <Button
-            disabled={!isWalletConnected || isLoading || isLoadingTokens}
-            onClick={handleDeposit}
-          >
-            {!isWalletConnected || isLoading || isLoadingTokens ? (
-              <Spinner variant="secondary" />
-            ) : (
-              "Confirm"
-            )}
-          </Button>
+          <Button onClick={handleDeposit}>Confirm</Button>
         </div>
       </div>
     </ResponsiveDialog>

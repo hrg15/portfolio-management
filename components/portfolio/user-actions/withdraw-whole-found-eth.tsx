@@ -12,7 +12,7 @@ import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-ho
 import { usePortfolioEndpoints } from "@/lib/smart-contract/endpoints/portfolio/portfolio-hooks";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import { filterTokenPairs, filterUSDCTokenPairs } from "@/lib/utils";
-import { AbiCoder } from "ethers";
+import { AbiCoder, ethers } from "ethers";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -20,7 +20,7 @@ const WithdrawWholeFoundEth = () => {
   const [pairTokens, setPairTokens] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoadingTokens, setIsLoadingTokens] = useState(false);
-  const [tokens, setTokens] = useState<any[]>([]);
+  const [balance, setBalance] = useState(0);
   const [usdcPairTokens, setUsdcPairTokens] = useState<string[]>([]);
 
   const [calculatedPercent, setCalculatedPercent] = useState(0);
@@ -33,77 +33,36 @@ const WithdrawWholeFoundEth = () => {
     }
   };
 
-  const { contract, isWalletConnected } = useSmartContractStore();
-  const { userWithdrawWholeFundWETH } = usePortfolioEndpoints();
-  const { tokensList } = useAdminEndpoints();
+  const { contract, isWalletConnected, account } = useSmartContractStore();
+  const { userWithdrawWholeFundWETH, balanceOf } = usePortfolioEndpoints();
 
   useEffect(() => {
-    const getTokens = async () => {
-      setIsLoadingTokens(true);
-      if (contract) {
-        const result = await tokensList();
-        const tokenAddresses = [];
-        for (let i = 0; i < result.length; i++) {
-          tokenAddresses.push(result[i]);
-        }
-        setTokens(tokenAddresses);
+    const getBalanceOfAccount = async () => {
+      try {
+        const result = await balanceOf(account || "");
+        setBalance(result);
+      } catch (error) {
+        console.log("Error: " + error);
       }
-      setIsLoadingTokens(false);
     };
-    getTokens();
-  }, [isWalletConnected]);
 
-  const { data, isLoading } = tokensHooks.useQueryPairTokens(
-    {
-      params: {
-        token: tokens.join(","),
-      },
-    },
-    {
-      enabled: isOpen,
-    },
-  );
-  const { data: usdcPairs, isLoading: usdcPairsLoading } =
-    tokensHooks.useQueryPairTokens(
-      {
-        params: {
-          token: USDC_T0KEN_PAIR,
-        },
-      },
-      {
-        enabled: isOpen,
-      },
-    );
-
-  useEffect(() => {
-    if (data?.pairs) {
-      setPairTokens(filterTokenPairs(data.pairs, tokens));
+    if (account!! && isWalletConnected) {
+      getBalanceOfAccount();
     }
-  }, [data?.pairs, tokens]);
+  }, [account, isWalletConnected]);
 
-  useEffect(() => {
-    if (usdcPairs?.pairs) {
-      setUsdcPairTokens(filterUSDCTokenPairs(usdcPairs.pairs));
-    }
-  }, [usdcPairs?.pairs, tokens]);
+  // async function calculatePercentageOfBalance(percentage) {
+  //   const percentageOfBalance = (balance * percentage) / 100;
+  //   return percentageOfBalance;
+  // }
 
   const handleUserWithdrawEth = async () => {
-    const pairAddress = [...pairTokens, usdcPairTokens[0]];
-    const version = pairAddress.map((t) => "3");
-
-    const abiCoder = new AbiCoder();
-    const encodedData = abiCoder.encode(
-      ["address[]", "string[]"],
-      [pairAddress, version],
-    );
-
-    console.log([pairAddress, version], calculatedPercent);
-
+    const ethBalance = ethers.formatEther(balance);
+    const percentageOfBalance = (+ethBalance * +calculatedPercent) / 100;
+    console.log("percentageOfBalance", percentageOfBalance);
+    const amount = ethers.parseEther(percentageOfBalance + "");
     try {
-      const result = await userWithdrawWholeFundWETH(
-        encodedData,
-        calculatedPercent,
-      );
+      const result = await userWithdrawWholeFundWETH(amount);
       setIsOpen(false);
     } catch (error) {
       console.log("Error", error);
@@ -161,24 +120,7 @@ const WithdrawWholeFoundEth = () => {
           >
             Cancel
           </Button>
-          <Button
-            disabled={
-              !isWalletConnected ||
-              isLoading ||
-              isLoadingTokens ||
-              usdcPairsLoading
-            }
-            onClick={handleUserWithdrawEth}
-          >
-            {!isWalletConnected ||
-            isLoading ||
-            isLoadingTokens ||
-            usdcPairsLoading ? (
-              <Spinner variant="secondary" />
-            ) : (
-              "Confirm"
-            )}
-          </Button>
+          <Button onClick={handleUserWithdrawEth}>Confirm</Button>
         </div>
       </div>
     </ResponsiveDialog>

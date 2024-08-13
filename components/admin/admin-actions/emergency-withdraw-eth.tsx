@@ -13,77 +13,13 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const EmergencyWithdrawToETH = () => {
-  const [pairTokens, setPairTokens] = useState<string[]>([]);
-  const [usdcPairTokens, setUsdcPairTokens] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoadingTokens, setIsLoadingTokens] = useState(false);
-  const [tokens, setTokens] = useState<any[]>([]);
 
   const { adminWithdrawWholeFundWETH, tokensList } = useAdminEndpoints();
-  const { contract, isWalletConnected } = useSmartContractStore();
-
-  useEffect(() => {
-    const getTokens = async () => {
-      setIsLoadingTokens(true);
-      if (contract) {
-        const result = await tokensList();
-        const tokenAddresses = [];
-        for (let i = 0; i < result.length; i++) {
-          tokenAddresses.push(result[i]);
-        }
-        setTokens(tokenAddresses);
-      }
-      setIsLoadingTokens(false);
-    };
-    getTokens();
-  }, [isWalletConnected]);
-
-  const { data, isLoading } = tokensHooks.useQueryPairTokens(
-    {
-      params: {
-        token: tokens.join(","),
-      },
-    },
-    {
-      enabled: isOpen,
-    },
-  );
-  const { data: usdcPairs, isLoading: usdcPairsLoading } =
-    tokensHooks.useQueryPairTokens(
-      {
-        params: {
-          token: USDC_T0KEN_PAIR,
-        },
-      },
-      {
-        enabled: isOpen,
-      },
-    );
-
-  useEffect(() => {
-    if (data?.pairs) {
-      setPairTokens(filterTokenPairs(data.pairs, tokens));
-    }
-  }, [data?.pairs, tokens]);
-
-  useEffect(() => {
-    if (usdcPairs?.pairs) {
-      setUsdcPairTokens(filterUSDCTokenPairs(usdcPairs.pairs));
-    }
-  }, [usdcPairs?.pairs, tokens]);
 
   const handleWithdraw = async () => {
-    const pairAddress = [...pairTokens, usdcPairTokens[0]];
-    const version = pairAddress.map((t) => "3");
-
-    const abiCoder = new AbiCoder();
-    const encodedData = abiCoder.encode(
-      ["address[]", "string[]"],
-      [pairAddress, version],
-    );
-
     try {
-      const result = await adminWithdrawWholeFundWETH(encodedData);
+      const result = await adminWithdrawWholeFundWETH();
       setIsOpen(false);
     } catch (error) {
       console.log("error:" + error);
@@ -121,16 +57,7 @@ const EmergencyWithdrawToETH = () => {
           >
             Cancel
           </Button>
-          <Button
-            disabled={isLoading || isLoadingTokens || usdcPairsLoading}
-            onClick={handleWithdraw}
-          >
-            {isLoading || isLoadingTokens || usdcPairsLoading ? (
-              <Spinner variant="secondary" />
-            ) : (
-              "Confirm"
-            )}
-          </Button>
+          <Button onClick={handleWithdraw}>Confirm</Button>
         </div>
       </div>
     </ResponsiveDialog>

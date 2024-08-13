@@ -5,9 +5,7 @@ import { TooltipProvider } from "./ui/tooltip";
 import ClientSideRendering from "./client-side-rendering";
 import { queryClient } from "@/lib/query-client";
 import useWindowSize from "@/lib/hooks/use-window-size";
-import { toast, Toaster } from "sonner";
-import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
-import { useEffect } from "react";
+import { Toaster } from "sonner";
 import AdminAuth from "./admin-auth";
 
 export function Providers({ children }: { children: React.ReactNode }) {

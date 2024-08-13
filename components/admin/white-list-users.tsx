@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import Spinner from "../spinner";
 import { ResponsiveDialog } from "../responsive-dialog";
+import { Switch } from "../ui/switch";
 
 const WhiteListUsers = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -35,21 +36,21 @@ const WhiteListUsers = () => {
   const { removeWhitelisted, usersList } = useAdminEndpoints();
   const { contract, isWalletConnected } = useSmartContractStore();
 
-  useEffect(() => {
-    const getUsers = async () => {
-      setIsLoading(true);
-      if (contract) {
-        const result = await usersList();
-        const userAddress = [];
-        for (let i = 0; i < result.length; i++) {
-          userAddress.push(result[i]);
-        }
-        setUsers(userAddress);
-      }
-      setIsLoading(false);
-    };
-    getUsers();
-  }, [isWalletConnected]);
+  // useEffect(() => {
+  //   const getUsers = async () => {
+  //     setIsLoading(true);
+  //     if (contract) {
+  //       const result = await usersList();
+  //       const userAddress = [];
+  //       for (let i = 0; i < result.length; i++) {
+  //         userAddress.push(result[i]);
+  //       }
+  //       setUsers(userAddress);
+  //     }
+  //     setIsLoading(false);
+  //   };
+  //   getUsers();
+  // }, [isWalletConnected]);
 
   const handleOpenDialog = (address: string) => {
     setSelectedUser(address);
@@ -80,7 +81,7 @@ const WhiteListUsers = () => {
             {isLoading && !users.length ? (
               <TableRow className="">
                 <TableCell className="flex items-center justify-center text-center">
-                  <Spinner variant="secondary" />
+                  {/* <Spinner variant="secondary" /> */}
                 </TableCell>
               </TableRow>
             ) : (
@@ -118,6 +119,7 @@ const AddUserDialog = ({
   setIsOpen: (val: boolean) => void;
 }) => {
   const [input, setInput] = useState("");
+  const [isActive, setIsActive] = useState(true);
   const { addWhiteListUser } = useAdminEndpoints();
 
   const handleInputChange = (value: string) => {
@@ -125,8 +127,9 @@ const AddUserDialog = ({
   };
   const handleSubmitAddToken = async () => {
     if (!!input) {
+      console.log(input, isActive);
       try {
-        const result = await addWhiteListUser(input);
+        const result = await addWhiteListUser(input, isActive);
         setIsOpen(false);
       } catch (error) {
         console.log("Error", error);
@@ -148,6 +151,10 @@ const AddUserDialog = ({
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder={`User Address`}
           />
+          <div className="flex w-full items-center justify-between">
+            <span className="opacity-85s text-sm">Add to white list</span>
+            <Switch checked={isActive} onCheckedChange={setIsActive} />
+          </div>
         </div>
         <Button
           onClick={handleSubmitAddToken}
@@ -170,11 +177,11 @@ const RemoveUserDialog = ({
   setIsOpen: (val: boolean) => void;
   address: string;
 }) => {
-  const { removeWhitelisted } = useAdminEndpoints();
+  const { addWhiteListUser } = useAdminEndpoints();
 
   const handleDeleteUser = async () => {
     try {
-      const result = await removeWhitelisted(address);
+      const result = await addWhiteListUser(address, false);
       setIsOpen(false);
     } catch (error) {
       console.log("Error remove user", error);

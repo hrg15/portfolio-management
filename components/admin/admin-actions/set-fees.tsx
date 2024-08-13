@@ -149,7 +149,7 @@ const SetBothFees = ({
 
   const handleSetFees = async () => {
     try {
-      const result = await setFeeData(+depositFee, +withdrawFee);
+      const result = await setFeeData(+depositFee * 100, +withdrawFee * 100);
       setIsOpen(false);
     } catch (error) {
       console.log("Error", error);

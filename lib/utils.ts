@@ -2,6 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { IPairs } from "./endpoints/schemas";
 import { CHAIN_ID, QUOTE_T0KEN } from "@/config";
+import { ethers } from "ethers";
 // import { isValidNumber } from "./math";
 
 export function cn(...inputs: ClassValue[]) {
@@ -188,6 +189,13 @@ export function monthDate() {
   return dateRange;
 }
 
+export function shortenString(str: string, maxLength: number = 10) {
+  if (str.length <= maxLength) {
+    return str;
+  }
+  return str.slice(0, maxLength - 3) + "...";
+}
+
 export const filterTokenPairs = (pairs: IPairs[], tokenList: string[]) => {
   const filteredPairs = pairs.filter(
     (pair) =>
@@ -197,17 +205,6 @@ export const filterTokenPairs = (pairs: IPairs[], tokenList: string[]) => {
   );
 
   const groupedPairs: { [key: string]: IPairs } = {};
-  // filteredPairs.forEach((pair) => {
-  //   const key = `${pair.baseToken.address}-${pair.quoteToken.address}`;
-  //   if (
-  //     !groupedPairs[key] ||
-  //     (pair.liquidity?.usd || 0) > (groupedPairs[key].liquidity?.usd || 0)
-  //   ) {
-  //     groupedPairs[key] = pair;
-  //   }
-  // });
-
-  // return filteredPairs.map((pair) => pair.pairAddress);
 
   filteredPairs.forEach((pair) => {
     const key = pair.baseToken.address;
@@ -220,11 +217,6 @@ export const filterTokenPairs = (pairs: IPairs[], tokenList: string[]) => {
   });
 
   return Object.values(groupedPairs).map((pair) => pair.pairAddress);
-
-  // return tokenList
-  //   ?.map((token) => groupedPairs[token])
-  //   .filter((pair) => pair !== undefined)
-  //   .map((pair) => pair.pairAddress);
 };
 
 export const filterUSDCTokenPairs = (pairs: IPairs[]) => {
@@ -236,32 +228,27 @@ export const filterUSDCTokenPairs = (pairs: IPairs[]) => {
   );
 
   const groupedPairs: { [key: string]: IPairs } = {};
-  // filteredPairs.forEach((pair) => {
-  //   const key = `${pair.baseToken.address}-${pair.quoteToken.address}`;
-  //   if (
-  //     !groupedPairs[key] ||
-  //     (pair.liquidity?.usd || 0) > (groupedPairs[key].liquidity?.usd || 0)
-  //   ) {
-  //     groupedPairs[key] = pair;
-  //   }
-  // });
-
   return filteredPairs.map((pair) => pair.pairAddress);
+};
 
-  // filteredPairs.forEach((pair) => {
-  //   const key = pair.baseToken.address;
-  //   if (
-  //     !groupedPairs[key] ||
-  //     (pair.liquidity?.usd || 0) > (groupedPairs[key].liquidity?.usd || 0)
-  //   ) {
-  //     groupedPairs[key] = pair;
-  //   }
-  // });
+export const filterBaseTokenPairs = (pairs: IPairs[]) => {
+  const filteredPairs = pairs.filter(
+    (pair) =>
+      pair.chainId === CHAIN_ID &&
+      pair.dexId === "uniswap" &&
+      pair.quoteToken.symbol === QUOTE_T0KEN,
+  );
 
-  // return Object.values(groupedPairs).map((pair) => pair.pairAddress);
+  const groupedPairs: { [key: string]: IPairs } = {};
 
-  // return tokenList
-  //   ?.map((token) => groupedPairs[token])
-  //   .filter((pair) => pair !== undefined)
-  //   .map((pair) => pair.pairAddress);
+  filteredPairs.forEach((pair) => {
+    const key = pair.baseToken.address;
+    if (!groupedPairs[key]) {
+      groupedPairs[key] = pair;
+    }
+  });
+
+  return Object.values(groupedPairs).map((pair) =>
+    ethers.parseEther(pair.priceUsd || ""),
+  );
 };

@@ -27,27 +27,34 @@ export const useAdminEndpoints = () => {
     return true;
   }, [isWalletConnected, contract, connectWallet]);
 
-  const checkAdminRole = useCallback(
-    async (codeBytes: string, signer: string) => {
-      if (!(await ensureConnection())) return false;
+  const checkAdminRole = useCallback(async () => {
+    if (!(await ensureConnection())) return false;
 
-      try {
-        const admin = await contract?.hasRole(codeBytes, signer);
-        return admin;
-      } catch (error) {
-        console.log(`Error checking admin role: ${(error as Error).message}`);
-        return false;
-      }
-    },
-    [contract, ensureConnection],
-  );
+    try {
+      const admin = await contract?.owner();
+      return admin;
+    } catch (error) {
+      console.log(`Error checking admin role: ${(error as Error).message}`);
+      return false;
+    }
+  }, [contract, ensureConnection]);
 
   const addNewTokens = useCallback(
-    async (tokenList: string[]) => {
+    async (
+      tokens: string[],
+      targetPercentages: number[],
+      versions: string[],
+      feeTiers: number[],
+    ) => {
       if (!(await ensureConnection())) return false;
 
       try {
-        const result = await contract?.addTokens(tokenList);
+        const result = await contract?.bulkAddTokens(
+          tokens,
+          targetPercentages,
+          versions,
+          feeTiers,
+        );
         return result;
       } catch (error) {
         handleErrors(error + "");
@@ -61,7 +68,7 @@ export const useAdminEndpoints = () => {
     if (!(await ensureConnection())) return false;
 
     try {
-      const result = await contract?.tokensList();
+      const result = await contract?.getAllTokens();
       return result;
     } catch (error) {
       handleErrors(error + "");
@@ -97,11 +104,11 @@ export const useAdminEndpoints = () => {
   }, [contract, ensureConnection]);
 
   const addWhiteListUser = useCallback(
-    async (address: string) => {
+    async (address: string, status: boolean) => {
       if (!(await ensureConnection())) return false;
 
       try {
-        const result = await contract?.addWhitelisted(address);
+        const result = await contract?.setWhitelist(address, status);
         return result;
       } catch (error) {
         handleErrors(error + "");
@@ -123,23 +130,22 @@ export const useAdminEndpoints = () => {
     }
   }, [contract, ensureConnection]);
 
-  const adminWithdrawWholeFundWETH = useCallback(
-    async (bytes: any) => {
-      if (!(await ensureConnection())) return false;
+  const adminWithdrawWholeFundWETH = useCallback(async () => {
+    if (!(await ensureConnection())) return false;
 
-      try {
-        const result = await contract?.adminWithdrawWholeFundWETH(bytes);
-        return result;
-      } catch (error) {
-        console.log(
-          `Admin Withdraw Whole Fund ETH Error: ${(error as Error).message}`,
-        );
-        handleErrors(error + "");
-        return;
-      }
-    },
-    [contract, ensureConnection],
-  );
+    try {
+      const result = await contract?.withdrawAllToETH({
+        gasLimit: 3000000,
+      });
+      await result.wait();
+    } catch (error) {
+      console.log(
+        `Admin Withdraw Whole Fund ETH Error: ${(error as Error).message}`,
+      );
+      handleErrors(error + "");
+      return;
+    }
+  }, [contract, ensureConnection]);
 
   const pauseOrUnpause = useCallback(
     async (val: boolean) => {
@@ -157,11 +163,13 @@ export const useAdminEndpoints = () => {
   );
 
   const doRebalance = useCallback(
-    async (bytes: any) => {
+    async (tokenPrices: number[]) => {
       if (!(await ensureConnection())) return false;
 
       try {
-        const result = await contract?.doRebalance(bytes);
+        const result = await contract?.rebalance(tokenPrices, {
+          gasLimit: 3000000,
+        });
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
@@ -177,7 +185,10 @@ export const useAdminEndpoints = () => {
       if (!(await ensureConnection())) return false;
 
       try {
-        const result = await contract?.depositRecoveryBalance(value);
+        const result = await contract?.depositRecoveryBalance(value, {
+          value: value,
+          gasLimit: 3000000,
+        });
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
@@ -188,26 +199,34 @@ export const useAdminEndpoints = () => {
     [contract, ensureConnection],
   );
 
-  const withdrawAccumulatedFees = useCallback(async () => {
-    if (!(await ensureConnection())) return false;
+  const withdrawAccumulatedFees = useCallback(
+    async (receiverFeeAddress: string) => {
+      if (!(await ensureConnection())) return false;
 
-    try {
-      const result = await contract?.withdrawAccumulatedFees();
-      return result;
-    } catch (error) {
-      console.log(`Error checking admin role: ${(error as Error).message}`);
-      handleErrors(error + "");
-      return null;
-    }
-  }, [contract, ensureConnection]);
+      try {
+        const result = await contract?.withdrawFeesByOwner(receiverFeeAddress, {
+          gasLimit: 3000000,
+        });
+        return result;
+      } catch (error) {
+        console.log(`Error checking admin role: ${(error as Error).message}`);
+        handleErrors(error + "");
+        return null;
+      }
+    },
+    [contract, ensureConnection],
+  );
 
   const setFeeData = useCallback(
     async (depositFee: number, withdrawFee: number) => {
       if (!(await ensureConnection())) return false;
 
       try {
-        const result = await contract?.setFeeData(depositFee, withdrawFee);
-        return result;
+        const result = await contract?.setFees(depositFee, withdrawFee, {
+          gasLimit: 3000000,
+        });
+        await result.wait();
+        // return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
         handleErrors(error + "");
@@ -222,6 +241,38 @@ export const useAdminEndpoints = () => {
 
       try {
         const result = await contract?.removeWhitelisted(address);
+        return result;
+      } catch (error) {
+        console.log(`Error checking admin role: ${(error as Error).message}`);
+        handleErrors(error + "");
+        return null;
+      }
+    },
+    [contract, ensureConnection],
+  );
+  const updateSlippageTolerance = useCallback(
+    async (percentage: number) => {
+      if (!(await ensureConnection())) return false;
+
+      try {
+        const result = await contract?.setSlippageTolerance(percentage, {
+          gasLimit: 3000000,
+        });
+        return result;
+      } catch (error) {
+        console.log(`Error checking admin role: ${(error as Error).message}`);
+        handleErrors(error + "");
+        return null;
+      }
+    },
+    [contract, ensureConnection],
+  );
+  const removeTokens = useCallback(
+    async (tokenIndex: number[]) => {
+      if (!(await ensureConnection())) return false;
+
+      try {
+        const result = await contract?.removeTokens(tokenIndex);
         return result;
       } catch (error) {
         console.log(`Error checking admin role: ${(error as Error).message}`);
@@ -247,5 +298,7 @@ export const useAdminEndpoints = () => {
     usersList,
     balanceOfToken,
     removeWhitelisted,
+    updateSlippageTolerance,
+    removeTokens,
   };
 };
