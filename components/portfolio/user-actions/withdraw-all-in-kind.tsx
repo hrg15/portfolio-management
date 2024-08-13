@@ -18,7 +18,6 @@ const WithdrawAllInKind = () => {
     const getBalanceOfAccount = async () => {
       try {
         const result = await balanceOf(account || "");
-        console.log("balance", result);
         setBalance(result);
       } catch (error) {
         console.log("Error: " + error);

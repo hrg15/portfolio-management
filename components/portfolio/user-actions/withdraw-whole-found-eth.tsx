@@ -19,7 +19,7 @@ import { toast } from "sonner";
 const WithdrawWholeFoundEth = () => {
   const [pairTokens, setPairTokens] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoadingTokens, setIsLoadingTokens] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [balance, setBalance] = useState(0);
   const [usdcPairTokens, setUsdcPairTokens] = useState<string[]>([]);
 
@@ -38,15 +38,17 @@ const WithdrawWholeFoundEth = () => {
 
   useEffect(() => {
     const getBalanceOfAccount = async () => {
+      setIsLoading(true);
       try {
         const result = await balanceOf(account || "");
         setBalance(result);
       } catch (error) {
         console.log("Error: " + error);
       }
+      setIsLoading(false);
     };
 
-    if (account!! && isWalletConnected) {
+    if (!!account && isWalletConnected) {
       getBalanceOfAccount();
     }
   }, [account, isWalletConnected]);
@@ -57,10 +59,11 @@ const WithdrawWholeFoundEth = () => {
   // }
 
   const handleUserWithdrawEth = async () => {
+    if (isLoading) return;
     const ethBalance = ethers.formatEther(balance);
     const percentageOfBalance = (+ethBalance * +calculatedPercent) / 100;
-    console.log("percentageOfBalance", percentageOfBalance);
     const amount = ethers.parseEther(percentageOfBalance + "");
+
     try {
       const result = await userWithdrawWholeFundWETH(amount);
       setIsOpen(false);
@@ -120,7 +123,9 @@ const WithdrawWholeFoundEth = () => {
           >
             Cancel
           </Button>
-          <Button onClick={handleUserWithdrawEth}>Confirm</Button>
+          <Button disabled={isLoading} onClick={handleUserWithdrawEth}>
+            Confirm
+          </Button>
         </div>
       </div>
     </ResponsiveDialog>

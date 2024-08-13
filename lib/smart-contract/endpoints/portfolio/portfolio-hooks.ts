@@ -51,9 +51,10 @@ export const usePortfolioEndpoints = () => {
 
       try {
         const tx = await contract?.withdrawToETH(amount, {
+          value: amount,
           gasLimit: 3000000,
         });
-        await tx.wait();
+        return tx;
       } catch (error) {
         console.log(`Error : ${(error as Error).message}`);
         handleErrors(error + "");
