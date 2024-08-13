@@ -10,7 +10,8 @@ import { MetamaskIcon } from "../icons/icons";
 import ConnectionButton from "../connection-button";
 
 const AdminHeader = () => {
-  const { balance, connectWallet, isWalletConnected } = useSmartContractStore();
+  const { balance, connectWallet, isWalletConnected, account } =
+    useSmartContractStore();
 
   return (
     <>
@@ -40,6 +41,9 @@ const AdminHeader = () => {
               height={80}
               style={{ width: "auto", height: "auto" }}
             />
+            {isWalletConnected && (
+              <span className="break-words">{account}</span>
+            )}
             <div className="my-20 block space-y-4">
               <h2 className="text-4xl font-semibold">Rebalance Portfolio</h2>
               <p>

@@ -223,16 +223,22 @@ const AddTokenDialog = ({
 
   const removeAddress = (index: number) => {
     const newAddresses = addresses.filter((_, i) => i !== index);
+    const newFees = fees.filter((_, i) => i !== index);
+    const newPercentages = percentages.filter((_, i) => i !== index);
+    const newVersions = versions.filter((_, i) => i !== index);
     setAddresses(newAddresses);
+    setFees(newFees);
+    setPercentages(newPercentages);
+    setVersions(newVersions);
     setInputs(inputs - 1);
   };
 
   const handleSubmitAddToken = async () => {
     console.log([addresses, percentages, versions, fees]);
-    if (!!addresses.length) {
-      const result = await addNewTokens(addresses, percentages, versions, fees);
-      setIsOpen(false);
-    }
+    // if (!!addresses.length) {
+    //   const result = await addNewTokens(addresses, percentages, versions, fees);
+    //   setIsOpen(false);
+    // }
   };
 
   return (
@@ -257,7 +263,7 @@ const AddTokenDialog = ({
                 />
                 <Input
                   type="text"
-                  defaultValue={percentages[index] / 100}
+                  // defaultValue={percentages[index] / 100}
                   onChange={(e) => handlePercentChange(index, +e.target.value)}
                   placeholder={`%`}
                   className="w-1/3"
@@ -266,7 +272,7 @@ const AddTokenDialog = ({
               <div className="my-4 flex items-center gap-2">
                 <Input
                   type="text"
-                  defaultValue={fees[index]}
+                  // defaultValue={fees[index]}
                   onChange={(e) => handleFeesChange(index, +e.target.value)}
                   placeholder={`Fee`}
                 />

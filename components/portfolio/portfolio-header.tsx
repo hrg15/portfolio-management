@@ -17,7 +17,8 @@ import UserActions from "./user-actions/user-actions";
 import ConnectionButton from "../connection-button";
 
 const PortfolioHeader = () => {
-  const { connectWallet, error, isWalletConnected } = useSmartContractStore();
+  const { connectWallet, error, isWalletConnected, account } =
+    useSmartContractStore();
 
   return (
     <>
@@ -47,6 +48,9 @@ const PortfolioHeader = () => {
               height={80}
               style={{ width: "auto", height: "auto" }}
             />
+            {isWalletConnected && (
+              <span className="break-words">{account}</span>
+            )}
             <div className="my-20 block space-y-4">
               <h2 className="text-2xl font-semibold sm:text-4xl">
                 Rebalance Portfolio
