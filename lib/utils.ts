@@ -204,17 +204,6 @@ export const filterTokenPairs = (pairs: IPairs[], tokenList: string[]) => {
   );
 
   const groupedPairs: { [key: string]: IPairs } = {};
-  // filteredPairs.forEach((pair) => {
-  //   const key = `${pair.baseToken.address}-${pair.quoteToken.address}`;
-  //   if (
-  //     !groupedPairs[key] ||
-  //     (pair.liquidity?.usd || 0) > (groupedPairs[key].liquidity?.usd || 0)
-  //   ) {
-  //     groupedPairs[key] = pair;
-  //   }
-  // });
-
-  // return filteredPairs.map((pair) => pair.pairAddress);
 
   filteredPairs.forEach((pair) => {
     const key = pair.baseToken.address;
@@ -227,11 +216,6 @@ export const filterTokenPairs = (pairs: IPairs[], tokenList: string[]) => {
   });
 
   return Object.values(groupedPairs).map((pair) => pair.pairAddress);
-
-  // return tokenList
-  //   ?.map((token) => groupedPairs[token])
-  //   .filter((pair) => pair !== undefined)
-  //   .map((pair) => pair.pairAddress);
 };
 
 export const filterUSDCTokenPairs = (pairs: IPairs[]) => {
@@ -243,32 +227,5 @@ export const filterUSDCTokenPairs = (pairs: IPairs[]) => {
   );
 
   const groupedPairs: { [key: string]: IPairs } = {};
-  // filteredPairs.forEach((pair) => {
-  //   const key = `${pair.baseToken.address}-${pair.quoteToken.address}`;
-  //   if (
-  //     !groupedPairs[key] ||
-  //     (pair.liquidity?.usd || 0) > (groupedPairs[key].liquidity?.usd || 0)
-  //   ) {
-  //     groupedPairs[key] = pair;
-  //   }
-  // });
-
   return filteredPairs.map((pair) => pair.pairAddress);
-
-  // filteredPairs.forEach((pair) => {
-  //   const key = pair.baseToken.address;
-  //   if (
-  //     !groupedPairs[key] ||
-  //     (pair.liquidity?.usd || 0) > (groupedPairs[key].liquidity?.usd || 0)
-  //   ) {
-  //     groupedPairs[key] = pair;
-  //   }
-  // });
-
-  // return Object.values(groupedPairs).map((pair) => pair.pairAddress);
-
-  // return tokenList
-  //   ?.map((token) => groupedPairs[token])
-  //   .filter((pair) => pair !== undefined)
-  //   .map((pair) => pair.pairAddress);
 };

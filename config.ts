@@ -5,7 +5,7 @@ export const GASPRICE_URL =
   process.env.GASPRICE_URL || "http://75.119.158.28:3000";
 
 export const CONTRACT_ADDRESS =
-  process.env.CONTRACT_ADDRESS || "0xDB3de5d9775e80F386bA18DFdFa036099c2B7aE8";
+  process.env.CONTRACT_ADDRESS || "0x59a64682989BeEa54e8b3DD2a4159835de0774A6";
 
 export const CHAIN_ID = "polygon";
 export const QUOTE_T0KEN = "WMATIC";
