@@ -51,7 +51,6 @@ export const usePortfolioEndpoints = () => {
 
       try {
         const tx = await contract?.withdrawToETH(amount, {
-          value: amount,
           gasLimit: 3000000,
         });
         return tx;
