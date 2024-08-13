@@ -86,7 +86,7 @@ const useSmartContractStore = create<BlockchainState>((set, get) => ({
         const address = await signer.getAddress();
         const contractInstance = new ethers.Contract(
           CONTRACT_ADDRESS,
-          contractABI.abi,
+          contractABI,
           signer,
         );
         const contractERC20Instance = new ethers.Contract(

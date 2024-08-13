@@ -7,23 +7,27 @@ import { USDC_T0KEN_PAIR } from "@/config";
 import { tokensHooks } from "@/lib/endpoints/tokens-endpoints";
 import { useAdminEndpoints } from "@/lib/smart-contract/endpoints/admin/admin-hooks";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
-import { filterTokenPairs, filterUSDCTokenPairs } from "@/lib/utils";
+import {
+  filterBaseTokenPairs,
+  filterTokenPairs,
+  filterUSDCTokenPairs,
+} from "@/lib/utils";
 import { AbiCoder } from "ethers";
 import { useEffect, useState } from "react";
 
 const DoRebalance = () => {
-  const [pairTokens, setPairTokens] = useState<string[]>([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [isLoadingTokens, setIsLoadingTokens] = useState(false);
-  const [usdcPairTokens, setUsdcPairTokens] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [tokens, setTokens] = useState<any[]>([]);
+  const [tokensPriceTokens, setTokensPrice] = useState<any[]>([]);
+
+  const { contract, isWalletConnected } = useSmartContractStore();
 
   const { doRebalance, tokensList } = useAdminEndpoints();
-  const { contract, isWalletConnected } = useSmartContractStore();
 
   useEffect(() => {
     const getTokens = async () => {
-      setIsLoadingTokens(true);
+      setIsLoading(true);
       if (contract) {
         const result = await tokensList();
         const tokenAddresses = [];
@@ -32,56 +36,33 @@ const DoRebalance = () => {
         }
         setTokens(tokenAddresses);
       }
-      setIsLoadingTokens(false);
+      setIsLoading(false);
     };
     getTokens();
   }, [isWalletConnected]);
 
-  const { data, isLoading } = tokensHooks.useQueryPairTokens(
-    {
-      params: {
-        token: tokens.join(","),
-      },
-    },
-    {
-      enabled: isOpen,
-    },
-  );
-  const { data: usdcPairs, isLoading: usdcPairsLoading } =
+  const { data, isLoading: tokensDataIsLoading } =
     tokensHooks.useQueryPairTokens(
       {
         params: {
-          token: USDC_T0KEN_PAIR,
+          token: tokens.join(","),
         },
       },
       {
-        enabled: isOpen,
+        enabled: tokens.length > 0,
       },
     );
 
   useEffect(() => {
     if (data?.pairs) {
-      setPairTokens(filterTokenPairs(data.pairs, tokens));
+      setTokensPrice(filterBaseTokenPairs(data.pairs));
     }
-  }, [data?.pairs, tokens]);
-
-  useEffect(() => {
-    if (usdcPairs?.pairs) {
-      setUsdcPairTokens(filterUSDCTokenPairs(usdcPairs.pairs));
-    }
-  }, [usdcPairs?.pairs, tokens]);
+  }, [data?.pairs]);
 
   const handleRebalance = async () => {
-    const pairAddress = [...pairTokens, usdcPairTokens[0]];
-    const version = pairAddress.map((t) => "3");
-    const types = ["address[]", "uint8[]"];
-    const abiCoder = new AbiCoder();
-    const encodedData = abiCoder.encode(types, [pairAddress, version]);
-
-    console.log([pairAddress, version]);
-
     try {
-      const result = await doRebalance(encodedData);
+      console.log(tokensPriceTokens);
+      const result = await doRebalance(tokensPriceTokens);
       setIsOpen(false);
     } catch (error) {
       console.log("error:" + error);
@@ -117,15 +98,8 @@ const DoRebalance = () => {
           >
             Cancel
           </Button>
-          <Button
-            disabled={isLoading || isLoadingTokens}
-            onClick={handleRebalance}
-          >
-            {isLoading || isLoadingTokens ? (
-              <Spinner variant="secondary" />
-            ) : (
-              "Rebalance"
-            )}
+          <Button disabled={tokensDataIsLoading} onClick={handleRebalance}>
+            Rebalance
           </Button>
         </div>
       </div>

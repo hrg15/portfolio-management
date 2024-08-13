@@ -12,34 +12,33 @@ import { Routes } from "@/lib/routes";
 
 const AdminAuth = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const { contract, signer, isWalletConnected, connectWallet } =
+  const { contract, signer, isWalletConnected, connectWallet, account } =
     useSmartContractStore();
   const { checkAdminRole } = useAdminEndpoints();
   const router = useRouter();
 
-  // useIsomorphicLayoutEffect(() => {
-  //   const adminRoleCheck = async () => {
-  //     if (contract && signer) {
-  //       const signerAddress = await signer.getAddress();
-  //       const isAdmin = await checkAdminRole(CODE_BYTES, signerAddress);
-  //       if (isAdmin) {
-  //         toast("Welcome, You have admin role!");
-  //         router.push(Routes.Admin);
-  //         setIsLoading(false);
-  //       } else {
-  //         router.push(Routes.Portfolio);
-  //         setIsLoading(false);
-  //       }
-  //     } else {
-  //       router.push(Routes.Portfolio);
-  //       setIsLoading(false);
-  //     }
-  //   };
+  useIsomorphicLayoutEffect(() => {
+    const adminRoleCheck = async () => {
+      if (contract && signer) {
+        const isAdmin = await checkAdminRole();
+        if (isAdmin === account) {
+          toast("Welcome, You have admin role!");
+          router.push(Routes.Admin);
+          setIsLoading(false);
+        } else {
+          router.push(Routes.Portfolio);
+          setIsLoading(false);
+        }
+      } else {
+        router.push(Routes.Portfolio);
+        setIsLoading(false);
+      }
+    };
 
-  //   adminRoleCheck();
-  // }, [isWalletConnected]);
+    adminRoleCheck();
+  }, [isWalletConnected]);
 
-  // if (isLoading) return <Loading />;
+  if (isLoading) return <Loading />;
 
   return children;
 };

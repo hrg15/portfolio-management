@@ -9,7 +9,7 @@ import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import { useRouter } from "next/navigation";
 
 export default function Home() {
-  const { contract, signer, isWalletConnected, connectWallet } =
+  const { contract, signer, isWalletConnected, connectWallet, account } =
     useSmartContractStore();
   const { checkAdminRole } = useAdminEndpoints();
   const router = useRouter();
@@ -17,9 +17,8 @@ export default function Home() {
   useIsomorphicLayoutEffect(() => {
     const adminRoleCheck = async () => {
       if (contract && signer) {
-        const signerAddress = await signer.getAddress();
-        const isAdmin = await checkAdminRole(CODE_BYTES, signerAddress);
-        if (isAdmin) {
+        const isAdmin = await checkAdminRole();
+        if (isAdmin === account) {
           router.push(Routes.Admin);
         } else {
           router.push(Routes.Portfolio);

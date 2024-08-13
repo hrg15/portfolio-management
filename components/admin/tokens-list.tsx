@@ -27,6 +27,15 @@ import Spinner from "../spinner";
 import { ResponsiveDialog } from "../responsive-dialog";
 import { tokensHooks } from "@/lib/endpoints/tokens-endpoints";
 import { IPairs } from "@/lib/endpoints/schemas";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 interface IBaseToke {
   address: string;
@@ -38,7 +47,6 @@ const TokensList = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [tokens, setTokens] = useState<any[]>([]);
-  const [tokensMetadata, setTokensMetadata] = useState<any | []>([]);
   const [isRemoveDialogOpen, setIsRemoveDialogOpen] = useState(false);
   const [selectedToken, setSelectedToken] = useState<number[] | null>([]);
 
@@ -73,8 +81,6 @@ const TokensList = () => {
       },
     );
 
-  // const isLoadingTokens = tokensDataIsLoading && tokens.length > 0;
-
   function handleUniqueBaseTokens(pairs: IPairs[]): IBaseToke[] {
     const uniqueTokens: { [key: string]: IBaseToke } = {};
     pairs.forEach(({ baseToken }) => {
@@ -86,25 +92,6 @@ const TokensList = () => {
 
     return Object.values(uniqueTokens).map((uniqueTokens) => uniqueTokens);
   }
-
-  // console.log(handleUniqueBaseTokens(data?.pairs || []));
-  // const baseAddresses = data?.pairs?.map((pair) => pair.baseToken.address);
-  // console.log(baseAddresses);
-  // console.log(tokens);
-
-  // useEffect(() => {
-  //   const getTokensMetadata = async () => {
-  //     if (tokens.length > 0) {
-  //       try {
-  //         const result = await getTokenMetadata(tokens);
-  //         setTokensMetadata(result?.raw || []);
-  //       } catch (error) {
-  //         toast.error("Couldn't get tokens.");
-  //       }
-  //     }
-  //   };
-  //   getTokensMetadata();
-  // }, [tokens]);
 
   return (
     <>
@@ -182,11 +169,11 @@ const SingleTokenRow = ({
       <TableCell className="font-medium">{token.symbol}</TableCell>
       <TableCell className="font-medium">{token.name}</TableCell>
       <TableCell className="font-medium">{token.address}</TableCell>
-      <TableCell className="text-right">
+      {/* <TableCell className="text-right">
         <button onClick={() => handleOpenDialog(index)}>
           <DeleteIcon className="size-6 hover:text-error" />
         </button>
-      </TableCell>
+      </TableCell> */}
     </TableRow>
   );
 };
@@ -200,6 +187,9 @@ const AddTokenDialog = ({
 }) => {
   const [inputs, setInputs] = useState(1);
   const [addresses, setAddresses] = useState<string[]>([""]);
+  const [fees, setFees] = useState<number[]>([0]);
+  const [versions, setVersions] = useState<string[]>([""]);
+  const [percentages, setPercentages] = useState<number[]>([0]);
 
   const { addNewTokens } = useAdminEndpoints();
 
@@ -208,10 +198,27 @@ const AddTokenDialog = ({
     newAddresses[index] = value;
     setAddresses(newAddresses);
   };
+  const handleFeesChange = (index: number, value: number) => {
+    const newArray = [...fees];
+    newArray[index] = value;
+    setFees(newArray);
+  };
+  const handlePercentChange = (index: number, value: number) => {
+    const newArray = [...percentages];
+    newArray[index] = value * 100;
+    setPercentages(newArray);
+  };
+  const handleVersionChange = (index: number, value: string) => {
+    const newArray = [...versions];
+    newArray[index] = value;
+    setVersions(newArray);
+  };
 
   const addAddress = () => {
     setInputs(inputs + 1);
     setAddresses([...addresses, ""]);
+    setFees([...fees, 0]);
+    setPercentages([...percentages, 0]);
   };
 
   const removeAddress = (index: number) => {
@@ -221,8 +228,9 @@ const AddTokenDialog = ({
   };
 
   const handleSubmitAddToken = async () => {
+    console.log([addresses, percentages, versions, fees]);
     if (!!addresses.length) {
-      const result = await addNewTokens(addresses);
+      const result = await addNewTokens(addresses, percentages, versions, fees);
       setIsOpen(false);
     }
   };
@@ -236,13 +244,47 @@ const AddTokenDialog = ({
         </DialogHeader>
         <div className="max-h-[450px] space-y-3 overflow-auto">
           {addresses.map((address, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <Input
-                type="text"
-                value={address}
-                onChange={(e) => handleInputChange(index, e.target.value)}
-                placeholder={`Address ${index + 1}`}
-              />
+            <div
+              key={index}
+              className="rounded-xl border border-neutral-600 p-3"
+            >
+              <div className="flex items-center gap-2">
+                <Input
+                  type="text"
+                  value={address}
+                  onChange={(e) => handleInputChange(index, e.target.value)}
+                  placeholder={`Address ${index + 1}`}
+                />
+                <Input
+                  type="text"
+                  defaultValue={percentages[index] / 100}
+                  onChange={(e) => handlePercentChange(index, +e.target.value)}
+                  placeholder={`%`}
+                  className="w-1/3"
+                />
+              </div>
+              <div className="my-4 flex items-center gap-2">
+                <Input
+                  type="text"
+                  defaultValue={fees[index]}
+                  onChange={(e) => handleFeesChange(index, +e.target.value)}
+                  placeholder={`Fee`}
+                />
+                <Select
+                  onValueChange={(value) => handleVersionChange(index, value)}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Version" />
+                  </SelectTrigger>
+                  <SelectContent className="dark">
+                    <SelectGroup>
+                      <SelectLabel>Version</SelectLabel>
+                      <SelectItem value="v2">2</SelectItem>
+                      <SelectItem value="v3">3</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
               <button type="button" onClick={() => removeAddress(index)}>
                 <DeleteIcon className="size-5 text-error" />
               </button>

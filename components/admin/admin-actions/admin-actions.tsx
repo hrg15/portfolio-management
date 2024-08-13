@@ -14,14 +14,14 @@ const AdminActions = () => {
   return (
     <div className="flex flex-col items-start justify-between gap-4 sm:flex-row">
       <div className="flex flex-wrap items-center gap-3">
-        <EmergencyWithdrawErc20 />
+        {/* <EmergencyWithdrawErc20 /> */}
         <EmergencyWithdrawToETH />
-        <PauseUnpause />
+        {/* <PauseUnpause /> */}
         <DoRebalance />
-        <DepositRecoveryBalance />
+        {/* <DepositRecoveryBalance /> */}
         <WithdrawAccumulatedFees />
         <SlipPage />
-        <GasPrice />
+        {/* <GasPrice /> */}
       </div>
       <SetFees />
     </div>
