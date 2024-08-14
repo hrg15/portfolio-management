@@ -1,12 +1,19 @@
 "use client";
 
 import React from "react";
-import { MetamaskIcon } from "./icons/icons";
+import { ArrowDownIcon, MetamaskIcon } from "./icons/icons";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import CopyButton from "./copy-button";
 
 const ConnectionButton = () => {
-  const { connectWallet, isWalletConnected, disconnect } =
+  const { connectWallet, isWalletConnected, disconnect, account } =
     useSmartContractStore();
 
   const handleConnection = () => {
@@ -18,11 +25,8 @@ const ConnectionButton = () => {
   };
 
   return (
-    <div>
-      <button
-        className="flex items-center gap-2 rounded-full border border-neutral-500 px-3 py-2"
-        onClick={handleConnection}
-      >
+    <div className="flex items-center gap-2 rounded-full border border-neutral-500 px-3 py-2">
+      <button className="flex items-center gap-2" onClick={handleConnection}>
         <span
           className={cn(
             "flex items-center gap-1 text-sm",
@@ -48,6 +52,24 @@ const ConnectionButton = () => {
         <MetamaskIcon className="size-5" />
         <div className="absolute -right-2 -top-2"></div>
       </button>
+      {!!account && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="flex items-center gap-1">
+              <ArrowDownIcon className="size-4" />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="no-scrollbar dark overflow-auto break-words max-sm:w-[250px]"
+          >
+            <DropdownMenuLabel className="flex items-center gap-2">
+              <span className="block break-words">{account}</span>
+              <CopyButton text={account} />
+            </DropdownMenuLabel>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   );
 };

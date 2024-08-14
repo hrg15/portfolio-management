@@ -285,8 +285,8 @@ const AddTokenDialog = ({
                   <SelectContent className="dark">
                     <SelectGroup>
                       <SelectLabel>Version</SelectLabel>
-                      <SelectItem value="v2">2</SelectItem>
-                      <SelectItem value="v3">3</SelectItem>
+                      <SelectItem value="v2">Uniswap version 2</SelectItem>
+                      <SelectItem value="v3">Uniswap version 3</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>

@@ -38,6 +38,7 @@ const WithdrawWholeFoundEth = () => {
 
   useEffect(() => {
     const getBalanceOfAccount = async () => {
+      if (!account || !isWalletConnected) return;
       setIsLoading(true);
       try {
         const result = await balanceOf(account || "");
@@ -48,22 +49,17 @@ const WithdrawWholeFoundEth = () => {
       setIsLoading(false);
     };
 
-    if (!!account && isWalletConnected) {
-      getBalanceOfAccount();
-    }
+    getBalanceOfAccount();
   }, [account, isWalletConnected]);
-
-  // async function calculatePercentageOfBalance(percentage) {
-  //   const percentageOfBalance = (balance * percentage) / 100;
-  //   return percentageOfBalance;
-  // }
 
   const handleUserWithdrawEth = async () => {
     if (isLoading) return;
     const ethBalance = ethers.formatEther(balance);
     const percentageOfBalance = (+ethBalance * +calculatedPercent) / 100;
-    const amount = ethers.parseEther(percentageOfBalance + "");
-
+    const roundedBalance = percentageOfBalance.toFixed(18);
+    console.log("roundedBalance", roundedBalance);
+    const amount = ethers.parseEther(roundedBalance);
+    console.log("amount", amount);
     try {
       const result = await userWithdrawWholeFundWETH(amount);
       setIsOpen(false);
