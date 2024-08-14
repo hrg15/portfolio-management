@@ -38,6 +38,7 @@ const WithdrawWholeFoundEth = () => {
 
   useEffect(() => {
     const getBalanceOfAccount = async () => {
+      if (!account || !isWalletConnected) return;
       setIsLoading(true);
       try {
         const result = await balanceOf(account || "");
@@ -48,9 +49,7 @@ const WithdrawWholeFoundEth = () => {
       setIsLoading(false);
     };
 
-    if (!!account && isWalletConnected) {
-      getBalanceOfAccount();
-    }
+    getBalanceOfAccount();
   }, [account, isWalletConnected]);
 
   // async function calculatePercentageOfBalance(percentage) {

@@ -4,7 +4,6 @@ import React from "react";
 import { ArrowDownIcon, MetamaskIcon } from "./icons/icons";
 import useSmartContractStore from "@/lib/smart-contract/use-smart-contract";
 import { cn } from "@/lib/utils";
-import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
