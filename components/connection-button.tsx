@@ -10,6 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import CopyButton from "./copy-button";
 
 const ConnectionButton = () => {
   const { connectWallet, isWalletConnected, disconnect, account } =
@@ -58,8 +59,14 @@ const ConnectionButton = () => {
               <ArrowDownIcon className="size-4" />
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="dark">
-            <DropdownMenuLabel>{account}</DropdownMenuLabel>
+          <DropdownMenuContent
+            align="end"
+            className="no-scrollbar dark overflow-auto break-words max-sm:w-[250px]"
+          >
+            <DropdownMenuLabel className="flex items-center gap-2">
+              <span className="block break-words">{account}</span>
+              <CopyButton text={account} />
+            </DropdownMenuLabel>
           </DropdownMenuContent>
         </DropdownMenu>
       )}
